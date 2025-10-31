@@ -40,7 +40,19 @@ financial-tracker/
 ### Core Entities
 
 ```typescript
-// 1. Expense
+// 1. Income
+interface Income {
+  id: string;
+  date: Date;
+  amount: number;
+  category: string; // e.g., Salary, Freelance, Gift, Investment Income
+  description: string;
+  source: string; // e.g., Employer, Client, Bank
+  recurring?: boolean;
+  attachments?: string[]; // e.g., pay stubs
+}
+
+// 2. Expense
 interface Expense {
   id: string;
   date: Date;
@@ -136,6 +148,7 @@ interface SavingsGoal {
 
 - **Quick Actions**:
   - Add Expense button
+  - Add Income button
   - Quick Transfer
   - Update Investment Returns
 
@@ -152,7 +165,19 @@ interface SavingsGoal {
   - List view with filters
   - Category analysis view
 
-### 3. Investment Manager (Mexican Fintech Focus)
+### 3. Income Tracker
+- **Features**:
+  - Quick entry form for income sources
+  - Categorization of income (e.g., Salary, Freelance, Bonus)
+  - Recurring income setup
+  - Link income to bank accounts
+
+- **Views**:
+  - List view with filters (by source, category, date)
+  - Monthly/Annual income summary
+  - Income trend analysis
+
+### 4. Investment Manager (Mexican Fintech Focus)
 - **Platform Cards** for Nu, Didi, MercadoPago:
   - Current balance with daily returns
   - GAT percentage display
@@ -167,7 +192,7 @@ interface SavingsGoal {
   - Compound interest calculator
   - Historical performance graphs
 
-### 4. Budget Planner
+### 5. Budget Planner
 - **Monthly Budget**:
   - Category-wise allocation
   - Real-time spending tracking
@@ -181,7 +206,7 @@ interface SavingsGoal {
   - Rollover unused budget option
   - Budget vs Actual comparison
 
-### 5. Accounts Overview
+### 6. Accounts Overview
 - **Bank Accounts Section**:
   - Card-based layout
   - Quick balance update
@@ -194,7 +219,7 @@ interface SavingsGoal {
   - Interest calculator
   - Minimum payment warnings
 
-### 6. Reports & Analytics
+### 7. Reports & Analytics
 - **Monthly Report**:
   - Income vs Expenses
   - Category breakdown
@@ -299,6 +324,7 @@ Info: #2196F3 (Blue)
 interface AppState {
   user: UserSettings;
   expenses: Expense[];
+  incomes: Income[];
   investments: Investment[];
   accounts: BankAccount[];
   creditCards: CreditCard[];
@@ -321,25 +347,29 @@ interface AppState {
 ### Key Formulas
 1. **Net Worth**: 
    ```
-   Total Bank Accounts + Total Investments + Total Savings - Total Credit Card Debt
+   Total Bank Accounts + Total Investments + Total Savings + Total Income - Total Credit Card Debt
+
+2. **Monthly Cash Flow**:
+   ```
+   Total Income - Total Expenses
    ```
 
-2. **Daily Investment Return**:
+3. **Daily Investment Return**:
    ```
    (Initial Capital × GAT% / 365)
    ```
 
-3. **ROI**:
+4. **ROI**:
    ```
    ((Current Value - Initial Investment) / Initial Investment) × 100
    ```
 
-4. **Budget Usage**:
+5. **Budget Usage**:
    ```
    (Category Expenses / Budget Limit) × 100
    ```
 
-5. **Savings Goal Progress**:
+6. **Savings Goal Progress**:
    ```
    (Current Amount / Target Amount) × 100
    ```
@@ -360,40 +390,46 @@ interface AppState {
 - Basic reporting
 - Search functionality
 
-### Phase 3: Financial Accounts (Week 2)
+### Phase 3: Income Tracking (Week 2)
+- Income entry form
+- Income category management
+- Income list with filters
+- Basic income reporting
+
+### Phase 4: Financial Accounts (Week 2)
 - Bank accounts CRUD
 - Credit cards management
 - Balance tracking
 - Account overview dashboard
 
-### Phase 4: Mexican Fintech Investments (Week 2-3)
+### Phase 5: Mexican Fintech Investments (Week 2-3)
 - Investment tracker for Nu/Didi/MercadoPago
 - GAT calculator
 - ROI comparisons
 - Daily returns tracking
 - Investment dashboard
 
-### Phase 5: Budget & Goals (Week 3)
+### Phase 6: Budget & Goals (Week 3)
 - Budget creation and tracking
 - Savings goals manager
 - Progress visualizations
 - Alert system
 - Recommendations engine
 
-### Phase 6: Analytics & Reports (Week 3-4)
+### Phase 7: Analytics & Reports (Week 3-4)
 - Chart integrations
 - Monthly/Annual reports
 - Export functionality (Excel/PDF)
 - Custom report builder
 
-### Phase 7: Mobile Optimization (Week 4)
+### Phase 8: Mobile Optimization (Week 4)
 - PWA configuration
 - Responsive refinements
 - Touch gestures
 - Offline capabilities
 - Performance optimization
 
-### Phase 8: Polish & Testing (Week 4)
+### Phase 9: Polish & Testing (Week 4)
 - UI/UX improvements
 - Error handling
 - Data validation
@@ -463,11 +499,12 @@ interface AppState {
 ### Priority Order
 1. Core data models and storage
 2. Expense tracking (most used feature)
-3. Dashboard with basic metrics
-4. Investment tracking (unique value prop)
-5. Budget management
-6. Reports and analytics
-7. Polish and optimizations
+3. Income tracking
+4. Dashboard with basic metrics
+5. Investment tracking (unique value prop)
+6. Budget management
+7. Reports and analytics
+8. Polish and optimizations
 
 ### Key Technical Decisions
 - Use IndexedDB through Dexie.js for better performance with large datasets

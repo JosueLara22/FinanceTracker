@@ -19,6 +19,7 @@ export {
 // Store initialization utility
 export const initializeStores = async () => {
   // Load all data from IndexedDB
+  // Note: loadUserSettings() and loadCategories() handle adding defaults if database is empty
   await Promise.all([
     useExpenseStore.getState().loadExpenses(),
     useIncomeStore.getState().loadIncomes(),
@@ -30,9 +31,6 @@ export const initializeStores = async () => {
     useSettingsStore.getState().loadUserSettings(),
     useSettingsStore.getState().loadCategories(),
   ]);
-
-  // Initialize defaults if needed (first-time setup)
-  await useSettingsStore.getState().initializeDefaults();
 };
 
 // Helper to get all store states (useful for debugging)
