@@ -1,7 +1,13 @@
-import { useState } from 'react'
+import { useAppContext } from './contexts/AppContext';
 
 function App() {
-  const [activeView] = useState('dashboard')
+  const { state } = useAppContext();
+
+  const totalExpenses = state.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const totalInvestments = state.investments.reduce((sum, investment) => sum + investment.currentValue, 0);
+  const totalBankAccounts = state.accounts.reduce((sum, account) => sum + account.balance, 0);
+  const totalCreditCardDebt = state.creditCards.reduce((sum, card) => sum + card.currentBalance, 0);
+  const netWorth = totalBankAccounts + totalInvestments - totalCreditCardDebt;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -9,7 +15,7 @@ function App() {
       <header className="bg-gradient-to-r from-primary to-primary-dark text-white shadow-lg">
         <div className="container mx-auto px-4 py-6">
           <h1 className="text-3xl font-bold">Rastreador Financiero</h1>
-          <p className="text-sm opacity-90 mt-1">Tu gestor de finanzas personales</p>
+          <p className="text-sm opacity-90 mt-1">Hola, {state.user.name}! Aquí está tu resumen financiero.</p>
         </div>
       </header>
 
@@ -17,29 +23,29 @@ function App() {
       <main className="container mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-            Bienvenido a tu Rastreador Financiero
+            Dashboard Principal
           </h2>
           <p className="text-gray-600 mb-4">
-            Gestiona tus gastos, inversiones y finanzas con soporte para plataformas mexicanas como Nu, Didi y MercadoPago.
+            Resumen de tus finanzas personales.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
             {/* Quick Stats Cards */}
             <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg p-6 shadow-md">
               <h3 className="text-lg font-semibold mb-2">Gastos del Mes</h3>
-              <p className="text-3xl font-bold">$0.00</p>
+              <p className="text-3xl font-bold">${totalExpenses.toLocaleString('es-MX')}</p>
               <p className="text-sm opacity-90 mt-1">MXN</p>
             </div>
 
             <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg p-6 shadow-md">
               <h3 className="text-lg font-semibold mb-2">Inversiones</h3>
-              <p className="text-3xl font-bold">$0.00</p>
+              <p className="text-3xl font-bold">${totalInvestments.toLocaleString('es-MX')}</p>
               <p className="text-sm opacity-90 mt-1">MXN</p>
             </div>
 
             <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg p-6 shadow-md">
               <h3 className="text-lg font-semibold mb-2">Patrimonio Neto</h3>
-              <p className="text-3xl font-bold">$0.00</p>
+              <p className="text-3xl font-bold">${netWorth.toLocaleString('es-MX')}</p>
               <p className="text-sm opacity-90 mt-1">MXN</p>
             </div>
           </div>
