@@ -127,7 +127,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onAddExpenseClick, onAddIn
             <h3 className="text-lg font-semibold mb-2">Quick Actions</h3>
             <div className="flex space-x-4">
 
-                <button onClick={onAddExpenseClick} className="bg-primary-DEFAULT text-white px-4 py-2 rounded-lg shadow hover:bg-primary-dark transition-colors">
+                <button onClick={onAddExpenseClick} className="bg-primary-dark text-white px-4 py-2 rounded-lg shadow hover:bg-primary-DEFAULT dark:bg-primary-DEFAULT dark:hover:bg-primary-light transition-colors">
                     Add Expense
                 </button>
                 <button onClick={onAddIncomeClick} className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition-colors">

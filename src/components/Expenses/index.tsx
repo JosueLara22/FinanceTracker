@@ -66,7 +66,7 @@ export const Expenses: React.FC = () => {
         </div>
         <button
           onClick={() => setExpenseFormOpen(true)}
-          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-DEFAULT hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-DEFAULT"
+          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-dark hover:bg-primary-DEFAULT dark:bg-primary-DEFAULT dark:hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-dark"
         >
           Agregar Gasto
         </button>
@@ -79,8 +79,8 @@ export const Expenses: React.FC = () => {
             onClick={() => setActiveTab('list')}
             className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'list'
-                ? 'border-primary-DEFAULT text-primary-DEFAULT dark:text-primary-light'
-                : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                ? 'border-primary-dark text-primary-dark dark:border-primary-light dark:text-primary-light'
+                : 'border-transparent text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300'
             }`}
           >
             Lista
@@ -89,8 +89,8 @@ export const Expenses: React.FC = () => {
             onClick={() => setActiveTab('calendar')}
             className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'calendar'
-                ? 'border-primary-DEFAULT text-primary-DEFAULT dark:text-primary-light'
-                : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                ? 'border-primary-dark text-primary-dark dark:border-primary-light dark:text-primary-light'
+                : 'border-transparent text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300'
             }`}
           >
             Calendario
@@ -99,8 +99,8 @@ export const Expenses: React.FC = () => {
             onClick={() => setActiveTab('reports')}
             className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'reports'
-                ? 'border-primary-DEFAULT text-primary-DEFAULT dark:text-primary-light'
-                : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                ? 'border-primary-dark text-primary-dark dark:border-primary-light dark:text-primary-light'
+                : 'border-transparent text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300'
             }`}
           >
             Reportes

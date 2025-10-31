@@ -83,7 +83,7 @@ export const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Buscar por descripción, categoría..."
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-DEFAULT focus:border-primary-DEFAULT dark:bg-gray-700 dark:text-white"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-DEFAULT focus:border-primary-DEFAULT bg-white text-gray-900 dark:bg-gray-700 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
         />
       </div>
 
@@ -136,7 +136,7 @@ export const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
       {/* Toggle Advanced Filters */}
       <button
         onClick={() => setShowAdvanced(!showAdvanced)}
-        className="text-sm text-primary-DEFAULT hover:text-primary-dark mb-4 flex items-center"
+        className="text-sm text-primary-dark hover:text-primary-DEFAULT dark:text-primary-DEFAULT dark:hover:text-primary-light mb-4 flex items-center"
       >
         {showAdvanced ? '▼' : '▶'} Filtros Avanzados
       </button>
@@ -154,7 +154,7 @@ export const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
                 type="date"
                 value={filters.expenses.dateFrom ? formatDateForInput(filters.expenses.dateFrom) : ''}
                 onChange={(e) => handleDateFromChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-DEFAULT focus:border-primary-DEFAULT dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-DEFAULT focus:border-primary-DEFAULT bg-white text-gray-900 dark:bg-gray-700 dark:text-white"
               />
             </div>
             <div>
@@ -165,7 +165,7 @@ export const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
                 type="date"
                 value={filters.expenses.dateTo ? formatDateForInput(filters.expenses.dateTo) : ''}
                 onChange={(e) => handleDateToChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-DEFAULT focus:border-primary-DEFAULT dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-DEFAULT focus:border-primary-DEFAULT bg-white text-gray-900 dark:bg-gray-700 dark:text-white"
               />
             </div>
           </div>
@@ -183,7 +183,7 @@ export const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
                 placeholder="$0"
                 min="0"
                 step="0.01"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-DEFAULT focus:border-primary-DEFAULT dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-DEFAULT focus:border-primary-DEFAULT bg-white text-gray-900 dark:bg-gray-700 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               />
             </div>
             <div>
@@ -197,7 +197,7 @@ export const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
                 placeholder="$0"
                 min="0"
                 step="0.01"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-DEFAULT focus:border-primary-DEFAULT dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-DEFAULT focus:border-primary-DEFAULT bg-white text-gray-900 dark:bg-gray-700 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               />
             </div>
           </div>
@@ -215,7 +215,7 @@ export const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
                     onClick={() => handleCategoryToggle(category.name)}
                     className={`px-3 py-1 text-sm rounded-full transition-colors ${
                       filters.expenses.categories?.includes(category.name)
-                        ? 'bg-primary-DEFAULT text-white'
+                        ? 'bg-primary-dark text-white dark:bg-primary-DEFAULT'
                         : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                     }`}
                   >
@@ -239,7 +239,7 @@ export const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
                     onClick={() => handlePaymentMethodToggle(method)}
                     className={`px-3 py-1 text-sm rounded-full transition-colors ${
                       filters.expenses.paymentMethods?.includes(method)
-                        ? 'bg-primary-DEFAULT text-white'
+                        ? 'bg-primary-dark text-white dark:bg-primary-DEFAULT'
                         : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                     }`}
                   >
@@ -269,22 +269,22 @@ export const ExpenseFilters: React.FC<ExpenseFiltersProps> = ({
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
           <p className="text-sm text-gray-600 dark:text-gray-400">
             <strong>Filtros activos:</strong>
-            {searchTerm && <span className="ml-2 bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded text-xs">Búsqueda: {searchTerm}</span>}
+            {searchTerm && <span className="ml-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-white px-2 py-1 rounded text-xs">Búsqueda: {searchTerm}</span>}
             {filters.expenses.categories && filters.expenses.categories.length > 0 && (
-              <span className="ml-2 bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded text-xs">
+              <span className="ml-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-white px-2 py-1 rounded text-xs">
                 {filters.expenses.categories.length} categoría{filters.expenses.categories.length > 1 ? 's' : ''}
               </span>
             )}
             {filters.expenses.paymentMethods && filters.expenses.paymentMethods.length > 0 && (
-              <span className="ml-2 bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded text-xs">
+              <span className="ml-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-white px-2 py-1 rounded text-xs">
                 {filters.expenses.paymentMethods.length} método{filters.expenses.paymentMethods.length > 1 ? 's' : ''}
               </span>
             )}
             {(filters.expenses.dateFrom || filters.expenses.dateTo) && (
-              <span className="ml-2 bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded text-xs">Rango de fechas</span>
+              <span className="ml-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-white px-2 py-1 rounded text-xs">Rango de fechas</span>
             )}
             {(filters.expenses.minAmount || filters.expenses.maxAmount) && (
-              <span className="ml-2 bg-blue-100 dark:bg-blue-900 px-2 py-1 rounded text-xs">Rango de monto</span>
+              <span className="ml-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-white px-2 py-1 rounded text-xs">Rango de monto</span>
             )}
           </p>
         </div>
