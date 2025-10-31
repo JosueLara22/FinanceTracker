@@ -30,7 +30,7 @@ export interface Investment {
 export interface BankAccount {
   id: string;
   bank: string;
-  accountType: 'checking' | 'savings' | 'investment';
+  accountType: 'checking' | 'savings' | 'investment' | 'credit card';
   accountNumber: string; // Last 4 digits only
   balance: number;
   currency: 'MXN' | 'USD';

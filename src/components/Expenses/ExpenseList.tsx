@@ -30,17 +30,17 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onDeleteExpe
   return (
     <div className="space-y-4">
       {expenses.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(expense => (
-        <div key={expense.id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex justify-between items-center">
+        <div key={expense.id} className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-md flex justify-between items-center">
           <div>
             <p className="font-bold text-lg dark:text-gray-300">{expense.description}</p>
             <p className="text-sm text-gray-600 dark:text-gray-400">{expense.category}</p>
             <p className="text-sm text-gray-500 dark:text-gray-500">{formatDate(expense.date)}</p>
           </div>
           <div className="text-right">
-            <p className="font-bold text-xl text-red-500">{formatCurrency(expense.amount)}</p>
+            <p className="font-bold text-xl text-danger">{formatCurrency(expense.amount)}</p>
             <div className="flex items-center space-x-2 justify-end mt-2">
               
-              <button onClick={() => onDeleteExpense(expense.id)} className="text-sm text-red-500 hover:underline">Delete</button>
+              <button onClick={() => onDeleteExpense(expense.id)} className="text-sm text-danger hover:underline">Delete</button>
             </div>
           </div>
         </div>

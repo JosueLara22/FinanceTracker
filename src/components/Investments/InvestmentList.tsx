@@ -59,7 +59,7 @@ export const InvestmentList: React.FC<InvestmentListProps> = ({ investments, onU
           : 0;
 
         return (
-          <div key={investment.id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex flex-col justify-between">
+          <div key={investment.id} className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-md flex flex-col justify-between">
             <div>
               <div className="flex justify-between items-start">
                 <h3 className="font-bold text-xl dark:text-gray-300">{investment.platform}</h3>
@@ -75,15 +75,15 @@ export const InvestmentList: React.FC<InvestmentListProps> = ({ investments, onU
               </div>
               <div className="flex justify-between">
                 <span>Current Value:</span>
-                <span className="font-bold text-2xl text-green-600 dark:text-green-400">{formatCurrency(investment.currentValue)}</span>
+                <span className="font-bold text-2xl text-success">{formatCurrency(investment.currentValue)}</span>
               </div>
                <div className="flex justify-between">
                 <span>Accumulated Returns:</span>
-                <span className="font-semibold text-green-500 dark:text-green-400">{formatCurrency(investment.accumulatedReturns)}</span>
+                <span className="font-semibold text-success">{formatCurrency(investment.accumulatedReturns)}</span>
               </div>
               <div className="flex justify-between">
                 <span>ROI:</span>
-                <span className={`font-bold ${roi >= 0 ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
+                <span className={`font-bold ${roi >= 0 ? 'text-success' : 'text-danger'}`}>
                   {roi.toFixed(2)}%
                 </span>
               </div>
@@ -101,8 +101,8 @@ export const InvestmentList: React.FC<InvestmentListProps> = ({ investments, onU
             </div>
 
             <div className="flex items-center justify-between mt-4">
-              <button onClick={() => handleUpdateReturns(investment)} className="text-sm text-blue-500 hover:underline">Update Returns</button>
-              <button onClick={() => onDeleteInvestment(investment.id)} className="text-sm text-red-500 hover:underline">Delete</button>
+              <button onClick={() => handleUpdateReturns(investment)} className="text-sm text-primary-DEFAULT hover:underline">Update Returns</button>
+              <button onClick={() => onDeleteInvestment(investment.id)} className="text-sm text-danger hover:underline">Delete</button>
             </div>
           </div>
         )

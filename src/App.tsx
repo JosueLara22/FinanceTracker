@@ -30,7 +30,7 @@ function App() {
 
   return (
     <Router>
-      <main className={`bg-gray-100 dark:bg-gray-900 min-h-screen`}>
+      <main className={`bg-gray-50 dark:bg-gray-900 min-h-screen`}>
         <Header />
         <div className="container mx-auto p-4">
           <Routes>

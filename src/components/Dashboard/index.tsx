@@ -19,9 +19,8 @@ interface DashboardCardProps {
 }
 
 const DashboardCard: React.FC<DashboardCardProps> = ({ title, value, description }) => (
-  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-    <h3 className="text-gray-500 dark:text-gray-400 text-sm font-semibold">{title}</h3>
-    <p className="text-3xl font-bold text-purple-700 dark:text-purple-400 my-2">{value}</p>
+  <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-md">
+    <p className="text-3xl font-bold text-primary-DEFAULT dark:text-primary-dark my-2">{value}</p>
     <p className="text-gray-400 dark:text-gray-500 text-xs">{description}</p>
   </div>
 );
@@ -105,7 +104,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onAddExpenseClick }) => {
             <h3 className="text-lg font-semibold mb-2">Quick Actions</h3>
             <div className="flex space-x-4">
 
-                <button onClick={onAddExpenseClick} className="bg-purple-600 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700 transition-colors">
+                <button onClick={onAddExpenseClick} className="bg-primary-DEFAULT text-white px-4 py-2 rounded-lg shadow hover:bg-primary-dark transition-colors">
                     Add Expense
                 </button>
                 <button className="bg-gray-300 text-gray-500 px-4 py-2 rounded-lg shadow cursor-not-allowed" disabled>
@@ -115,19 +114,16 @@ export const Dashboard: React.FC<DashboardProps> = ({ onAddExpenseClick }) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                <h3 className="font-semibold mb-4 dark:text-gray-300">Expense Trend (Last 6 Months)</h3>
+            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-md">
                 <ExpenseChart expenses={expenses} />
             </div>
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                <h3 className="font-semibold mb-4 dark:text-gray-300">Category Breakdown</h3>
+            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-md">
                 <CategoryChart expenses={expenses} />
             </div>
         </div>
 
         <div className="mt-6">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                <h3 className="font-semibold mb-4 dark:text-gray-300">Investment Performance</h3>
+            <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-md">
                 <InvestmentChart investments={investments} />
             </div>
         </div>

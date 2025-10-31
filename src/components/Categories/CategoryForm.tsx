@@ -18,7 +18,6 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ onClose }) => {
       return;
     }
     addCategory({
-      id: Date.now().toString(), // Simple unique ID
       name,
       type,
       icon,

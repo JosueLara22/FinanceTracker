@@ -279,8 +279,6 @@ interface SavingsGoal {
 
 ### Color Palette
 ```css
-Primary: #667eea (Purple)
-Secondary: #764ba2 (Dark Purple)
 Success: #4CAF50 (Green)
 Warning: #FFC107 (Amber)
 Danger: #F44336 (Red)

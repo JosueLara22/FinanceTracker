@@ -48,28 +48,23 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onAddExpense, onClose 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
           type="text"
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="p-2 border rounded w-full bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+          className="p-2 border rounded w-full bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary-DEFAULT focus:border-transparent"
         />
         <input
           type="number"
           placeholder="Amount (MXN)"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="p-2 border rounded w-full bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+          className="p-2 border rounded w-full bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary-DEFAULT focus:border-transparent"
         />
         <input
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="p-2 border rounded w-full bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+          className="p-2 border rounded w-full bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary-DEFAULT focus:border-transparent"
         />
         <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="p-2 border rounded w-full bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+          className="p-2 border rounded w-full bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary-DEFAULT focus:border-transparent"
         >
           <option value="" disabled>Select Category</option>
           {expenseCategories.map(c => (
@@ -79,7 +74,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onAddExpense, onClose 
          <select
           value={paymentMethod}
           onChange={(e) => setPaymentMethod(e.target.value)}
-          className="p-2 border rounded w-full bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+          className="p-2 border rounded w-full bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary-DEFAULT focus:border-transparent"
         >
           <option>Credit Card</option>
           <option>Debit Card</option>
@@ -91,10 +86,10 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onAddExpense, onClose 
         </select>
       </div>
       <div className="mt-4 flex justify-end space-x-4">
-        <button type="button" onClick={onClose} className="bg-gray-300 text-gray-800 p-2 rounded hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500">
+        <button type="button" onClick={onClose} className="bg-gray-300 text-gray-800 p-2 rounded-md hover:bg-gray-400 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500">
           Cancel
         </button>
-        <button type="submit" className="bg-purple-600 text-white p-2 rounded hover:bg-purple-700 dark:hover:bg-purple-800">
+        <button type="submit" className="bg-primary-DEFAULT text-white p-2 rounded-md hover:bg-primary-dark">
           Add Expense
         </button>
       </div>

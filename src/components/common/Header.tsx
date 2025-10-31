@@ -9,14 +9,14 @@ export const Header = () => {
   const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
     `px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
       isActive
-        ? 'bg-purple-700 text-white'
+        ? 'bg-primary-DEFAULT text-white'
         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
     }`;
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-md">
+    <header className="bg-gray-50 dark:bg-gray-900 shadow-md">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-purple-700 dark:text-purple-400">Financial Tracker</h1>
+        <h1 className="text-2xl font-bold text-primary-DEFAULT dark:text-primary-dark">Financial Tracker</h1>
         <nav className="flex space-x-4">
           <NavLink to="/" className={navLinkClasses}>
             Dashboard

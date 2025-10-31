@@ -8,8 +8,8 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(0, 0, 0, 0.87);
-  background-color: #ffffff;
+  color: #1a1d20; /* gray-900 */
+  background-color: #f8f9fa; /* gray-50 */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -29,6 +29,6 @@ body {
 }
 
 .dark body {
-  background-color: #1a202c;
-  color: #e2e8f0;
+  background-color: #1a1d20; /* gray-900 */
+  color: #e9ecef; /* gray-100 */
 }

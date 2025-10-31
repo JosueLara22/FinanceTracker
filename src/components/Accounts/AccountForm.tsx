@@ -18,7 +18,6 @@ export const AccountForm: React.FC<AccountFormProps> = ({ onClose }) => {
       return;
     }
     addAccount({
-      id: Date.now().toString(), // Simple unique ID
       bank,
       accountType,
       balance,

@@ -5,7 +5,7 @@ import { ExpenseForm } from './ExpenseForm'; // Import ExpenseForm
 import { useExpenses } from '../../hooks/useExpenses';
 
 export const Expenses: React.FC = () => {
-  const { expenses, addExpense, updateExpense, deleteExpense } = useExpenses(); // Add addExpense
+  const { expenses, addExpense, deleteExpense } = useExpenses(); // Add addExpense
   const [isExpenseFormOpen, setExpenseFormOpen] = useState(false);
 
   return (
@@ -14,7 +14,7 @@ export const Expenses: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Expenses</h1>
         <button
           onClick={() => setExpenseFormOpen(true)}
-          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-DEFAULT hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-DEFAULT"
         >
           Add New Expense
         </button>
@@ -22,7 +22,6 @@ export const Expenses: React.FC = () => {
 
       <ExpenseList 
         expenses={expenses}
-        onUpdateExpense={updateExpense}
         onDeleteExpense={deleteExpense}
       />
 

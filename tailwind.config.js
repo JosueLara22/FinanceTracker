@@ -9,16 +9,23 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#667eea',
-          dark: '#764ba2',
+          DEFAULT: '#0056b3',
+          dark: '#003f80',
         },
-        success: '#4CAF50',
-        warning: '#FFC107',
-        danger: '#F44336',
-        info: '#2196F3',
-        dark: {
-          background: '#1a202c',
-          text: '#e2e8f0',
+        success: '#28a745',
+        warning: '#ffc107',
+        danger: '#dc3545',
+        gray: { // This will override default Tailwind grays, ensure this is desired or merge carefully
+          50: '#f8f9fa',
+          100: '#e9ecef',
+          200: '#dee2e6',
+          300: '#ced4da',
+          400: '#adb5bd',
+          500: '#6c757d',
+          600: '#495057',
+          700: '#343a40',
+          800: '#212529',
+          900: '#1a1d20',
         },
       },
     },
