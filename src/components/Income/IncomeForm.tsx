@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Income } from '../../types';
 import { useCategories } from '../../hooks/useCategories';
+import { useAccountStore } from '../../stores/useAccountStore';
 
 interface IncomeFormProps {
   income?: Income;
@@ -14,7 +15,17 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ income, onAddIncome, onC
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [category, setCategory] = useState('');
   const [source, setSource] = useState('');
+  const [accountId, setAccountId] = useState<string>('');
   const [recurring, setRecurring] = useState(false);
+
+  const { categories } = useCategories();
+  const { accounts, loadAccounts } = useAccountStore();
+  const incomeCategories = categories.filter(c => c.type === 'income');
+
+  // Load accounts
+  useEffect(() => {
+    loadAccounts();
+  }, [loadAccounts]);
 
   // Pre-populate form when editing
   useEffect(() => {
@@ -24,12 +35,10 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ income, onAddIncome, onC
       setDate(new Date(income.date).toISOString().split('T')[0]);
       setCategory(income.category);
       setSource(income.source);
+      setAccountId(income.accountId || '');
       setRecurring(income.recurring || false);
     }
   }, [income]);
-
-  const { categories } = useCategories();
-  const incomeCategories = categories.filter(c => c.type === 'income');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,13 +47,17 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ income, onAddIncome, onC
       return;
     }
 
+    const now = new Date();
     onAddIncome({
       date: new Date(date),
       amount: parseFloat(amount),
       category,
       description,
       source,
+      accountId: accountId || undefined,
       recurring,
+      createdAt: income?.createdAt || now,
+      updatedAt: now,
     });
 
     // Reset form
@@ -53,6 +66,7 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ income, onAddIncome, onC
     setDate(new Date().toISOString().split('T')[0]);
     setCategory('');
     setSource('');
+    setAccountId('');
     setRecurring(false);
 
     onClose?.(); // Close the modal on successful submission
@@ -99,6 +113,18 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ income, onAddIncome, onC
           onChange={(e) => setSource(e.target.value)}
           className="p-2 border rounded w-full bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary-DEFAULT focus:border-transparent"
         />
+        <select
+          value={accountId}
+          onChange={(e) => setAccountId(e.target.value)}
+          className="p-2 border rounded w-full bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary-DEFAULT focus:border-transparent"
+        >
+          <option value="">Select Account (Optional)</option>
+          {accounts.filter(a => a.isActive).map(account => (
+            <option key={account.id} value={account.id}>
+              {account.bank} ****{account.accountNumber} ({account.accountType})
+            </option>
+          ))}
+        </select>
         <div className="flex items-center mt-2">
           <input
             type="checkbox"

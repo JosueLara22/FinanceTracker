@@ -3,6 +3,8 @@ import { devtools } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { Income } from '../types';
 import { db } from '../data/db';
+import { useTransactionStore } from './useTransactionStore';
+import { useAccountStore } from './useAccountStore';
 
 interface IncomeState {
   incomes: Income[];
@@ -56,6 +58,25 @@ export const useIncomeStore = create<IncomeState>()(
           };
 
           await db.incomes.add(newIncome);
+
+          // Create transaction if account is linked
+          if (newIncome.accountId) {
+            const transactionStore = useTransactionStore.getState();
+
+            // Create transaction
+            await transactionStore.addTransaction({
+              accountId: newIncome.accountId,
+              accountType: 'bank',
+              date: newIncome.date,
+              amount: newIncome.amount, // Positive for income
+              type: 'deposit',
+              description: newIncome.description,
+              category: newIncome.category,
+              balance: 0, // This will be recalculated
+              incomeId: newIncome.id,
+              pending: false,
+            });
+          }
 
           set((state) => ({
             incomes: [...state.incomes, newIncome],

@@ -3,6 +3,8 @@ import { devtools } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { Expense } from '../types';
 import { db } from '../data/db';
+import { useTransactionStore } from './useTransactionStore';
+import { useAccountStore } from './useAccountStore';
 
 interface ExpenseState {
   expenses: Expense[];
@@ -56,6 +58,28 @@ export const useExpenseStore = create<ExpenseState>()(
           };
 
           await db.expenses.add(newExpense);
+
+          // Create transaction if account is linked
+          if (newExpense.accountId && (newExpense.paymentMethod === 'debit' || newExpense.paymentMethod === 'credit' || newExpense.paymentMethod === 'transfer')) {
+            const transactionStore = useTransactionStore.getState();
+            const accountStore = useAccountStore.getState();
+
+            const accountType = newExpense.paymentMethod === 'credit' ? 'credit' : 'bank';
+
+            // Create transaction
+            await transactionStore.addTransaction({
+              accountId: newExpense.accountId,
+              accountType: accountType,
+              date: newExpense.date,
+              amount: -newExpense.amount, // Negative for expense
+              type: accountType === 'credit' ? 'charge' : 'withdrawal',
+              description: newExpense.description,
+              category: newExpense.category,
+              balance: 0, // This will be recalculated
+              expenseId: newExpense.id,
+              pending: false,
+            });
+          }
 
           set((state) => ({
             expenses: [...state.expenses, newExpense],

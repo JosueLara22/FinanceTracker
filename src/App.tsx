@@ -7,6 +7,7 @@ import { Accounts } from './components/Accounts';
 import { Income } from './components/Income';
 import { ExpenseForm } from './components/Expenses/ExpenseForm';
 import { IncomeForm } from './components/Income/IncomeForm';
+import { AccountDetail } from './components/Accounts/AccountDetail';
 import { Header } from './components/common/Header';
 import { Categories } from './components/Categories';
 import {
@@ -68,6 +69,10 @@ function App() {
             <Route path="/accounts" element={<Accounts />} />
             <Route path="/income" element={<Income />} />
             <Route path="/categories" element={<Categories />} />
+            <Route path="/accounts/bank/:id" element={<AccountDetail type="bank" />} />
+            <Route path="/accounts/credit/:id" element={<AccountDetail type="credit" />} />
+            <Route path="/expenses/:id" element={<Expenses />} />
+            <Route path="/incomes/:id" element={<Income />} />
           </Routes>
         </div>
 

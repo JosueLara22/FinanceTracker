@@ -8,7 +8,10 @@ export interface Income {
   description: string;
   source: string; // e.g., Employer, Client, Bank
   recurring?: boolean;
+  accountId?: string; // FK to BankAccount (where deposited)
   attachments?: string[]; // e.g., pay stubs
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Expense {
@@ -18,10 +21,13 @@ export interface Expense {
   category: string;
   subcategory?: string;
   description: string;
-  paymentMethod: string;
+  paymentMethod: 'cash' | 'debit' | 'credit' | 'transfer' | 'other';
+  accountId?: string; // FK to BankAccount or CreditCard
   tags?: string[];
   recurring?: boolean;
   attachments?: string[]; // base64 images of receipts
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Investment {
@@ -60,6 +66,47 @@ export interface CreditCard {
   cutoffDate: number; // Day of month
   paymentDate: number; // Day of month
   interestRate: number;
+}
+
+// Transaction (for accounts and cards)
+export interface Transaction {
+  id: string;
+  accountId: string; // FK to BankAccount or CreditCard
+  accountType: 'bank' | 'credit';
+  date: Date;
+  amount: number; // Positive for credits, negative for debits
+  type: 'deposit' | 'withdrawal' | 'transfer' | 'payment' | 'charge' | 'refund';
+  description: string;
+  category?: string;
+  balance: number; // Balance after this transaction
+  relatedTransactionId?: string; // For transfers (links both sides)
+  transferId?: string; // FK to Transfer.id
+  expenseId?: string; // FK to Expense.id
+  incomeId?: string; // FK to Income.id
+  pending: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Transfer (between accounts)
+export interface Transfer {
+  id: string;
+  fromAccountId: string;
+  fromAccountType: 'bank' | 'credit';
+  toAccountId: string;
+  toAccountType: 'bank' | 'credit';
+  amount: number;
+  fromCurrency: 'MXN' | 'USD';
+  toCurrency: 'MXN' | 'USD';
+  exchangeRate?: number; // If currency conversion
+  fee?: number;
+  date: Date;
+  description: string;
+  fromTransactionId: string; // FK to Transaction.id
+  toTransactionId: string; // FK to Transaction.id
+  status: 'pending' | 'completed' | 'failed';
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Budget {
@@ -122,6 +169,8 @@ export interface AppState {
   investments: Investment[];
   accounts: BankAccount[];
   creditCards: CreditCard[];
+  transactions: Transaction[];
+  transfers: Transfer[];
   budgets: Budget[];
   savingsGoals: SavingsGoal[];
   categories: Category[];
@@ -159,6 +208,18 @@ export type ActionType =
   | { type: 'UPDATE_CREDIT_CARD'; payload: CreditCard }
   | { type: 'DELETE_CREDIT_CARD'; payload: string }
   | { type: 'SET_CREDIT_CARDS'; payload: CreditCard[] }
+
+  // Transaction Actions
+  | { type: 'ADD_TRANSACTION'; payload: Transaction }
+  | { type: 'UPDATE_TRANSACTION'; payload: Transaction }
+  | { type: 'DELETE_TRANSACTION'; payload: string }
+  | { type: 'SET_TRANSACTIONS'; payload: Transaction[] }
+
+  // Transfer Actions
+  | { type: 'ADD_TRANSFER'; payload: Transfer }
+  | { type: 'UPDATE_TRANSFER'; payload: Transfer }
+  | { type: 'DELETE_TRANSFER'; payload: string }
+  | { type: 'SET_TRANSFERS'; payload: Transfer[] }
 
   // Budget Actions
   | { type: 'ADD_BUDGET'; payload: Budget }

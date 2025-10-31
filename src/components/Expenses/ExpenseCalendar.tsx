@@ -94,93 +94,190 @@ export const ExpenseCalendar: React.FC<ExpenseCalendarProps> = ({ expenses, onDa
   const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-      {/* Calendar Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white capitalize">
-          {monthName}
-        </h2>
-        <div className="flex gap-2">
-          <button
-            onClick={goToPreviousMonth}
-            className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
-          >
-            ←
-          </button>
-          <button
-            onClick={goToToday}
-            className="px-3 py-1 bg-primary-DEFAULT text-white rounded hover:bg-primary-dark"
-          >
-            Hoy
-          </button>
-          <button
-            onClick={goToNextMonth}
-            className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
-          >
-            →
-          </button>
-        </div>
-      </div>
 
-      {/* Calendar Grid */}
-      <div className="grid grid-cols-7 gap-2">
-        {/* Week day headers */}
-        {weekDays.map(day => (
-          <div
-            key={day}
-            className="text-center text-sm font-semibold text-gray-600 dark:text-gray-400 py-2"
-          >
-            {day}
-          </div>
-        ))}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6" data-testid="expense-calendar">
 
-        {/* Calendar days */}
-        {calendarData.map((day, index) => {
-          const isToday = isSameDate(day.date, new Date());
-          const hasExpenses = day.expenses.length > 0;
+        {/* Calendar Header */}
 
-          return (
-            <div
-              key={index}
-              onClick={() => hasExpenses && onDayClick?.(day.date, day.expenses)}
-              className={`
-                min-h-20 p-2 border rounded-lg transition-all
-                ${day.isCurrentMonth
-                  ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                  : 'bg-gray-50 dark:bg-gray-900 border-gray-100 dark:border-gray-800 opacity-50'
-                }
-                ${hasExpenses && day.isCurrentMonth ? 'cursor-pointer hover:shadow-md hover:border-primary-DEFAULT' : ''}
-                ${isToday ? 'ring-2 ring-primary-DEFAULT' : ''}
-              `}
+        <div className="flex items-center justify-between mb-6">
+
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white capitalize" data-testid="calendar-month-year">
+
+            {monthName}
+
+          </h2>
+
+          <div className="flex gap-2">
+
+            <button
+
+              onClick={goToPreviousMonth}
+
+              className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+
+              data-testid="prev-month-button"
+
             >
-              {/* Day number */}
+
+              ←
+
+            </button>
+
+            <button
+
+              onClick={goToToday}
+
+              className="px-3 py-1 bg-primary-DEFAULT text-white rounded hover:bg-primary-dark"
+
+              data-testid="today-button"
+
+            >
+
+              Hoy
+
+            </button>
+
+            <button
+
+              onClick={goToNextMonth}
+
+              className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+
+              data-testid="next-month-button"
+
+            >
+
+              →
+
+            </button>
+
+          </div>
+
+        </div>
+
+  
+
+        {/* Calendar Grid */}
+
+        <div className="grid grid-cols-7 gap-2" data-testid="calendar-grid">
+
+          {/* Week day headers */}
+
+          {weekDays.map(day => (
+
+            <div
+
+              key={day}
+
+              className="text-center text-sm font-semibold text-gray-600 dark:text-gray-400 py-2"
+
+            >
+
+              {day}
+
+            </div>
+
+          ))}
+
+  
+
+          {/* Calendar days */}
+
+          {calendarData.map((day, index) => {
+
+            const isToday = isSameDate(day.date, new Date());
+
+            const hasExpenses = day.expenses.length > 0;
+
+  
+
+            return (
+
               <div
-                className={`text-sm font-medium mb-1 ${
-                  isToday
-                    ? 'text-primary-DEFAULT font-bold'
-                    : day.isCurrentMonth
-                    ? 'text-gray-900 dark:text-white'
-                    : 'text-gray-400 dark:text-gray-600'
-                }`}
-              >
-                {day.date.getDate()}
+
+                key={index}
+
+                onClick={() => hasExpenses && onDayClick?.(day.date, day.expenses)}
+
+                className={`
+
+                  min-h-20 p-2 border rounded-lg transition-all
+
+                  ${
+
+                    day.isCurrentMonth
+
+                      ? 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+
+                      : 'bg-gray-50 dark:bg-gray-900 border-gray-100 dark:border-gray-800 opacity-50'
+
+                  }
+
+                  ${hasExpenses && day.isCurrentMonth ? 'cursor-pointer hover:shadow-md hover:border-primary-DEFAULT' : ''}
+
+                  ${isToday ? 'ring-2 ring-primary-DEFAULT' : ''}
+
+                `}
+
+                data-testid={`calendar-day-${day.date.toISOString().split('T')[0]}`}>
+
+  
+
+                {/* Day number */}
+
+                <div
+
+                  className={`text-sm font-medium mb-1 ${
+
+                    isToday
+
+                      ? 'text-primary-DEFAULT font-bold'
+
+                      : day.isCurrentMonth
+
+                      ? 'text-gray-900 dark:text-white'
+
+                      : 'text-gray-400 dark:text-gray-600'
+
+                  }`}
+
+                >
+
+                  {day.date.getDate()}
+
+                </div>
+
+  
+
+                {/* Expense info */}
+
+                {hasExpenses && day.isCurrentMonth && (
+
+                  <div className="space-y-1">
+
+                    <div className="text-xs font-semibold text-red-600 dark:text-red-400">
+
+                      {formatCurrency(day.total)}
+
+                    </div>
+
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+
+                      {day.expenses.length} gasto{day.expenses.length !== 1 ? 's' : ''}
+
+                    </div>
+
+                  </div>
+
+                )}
+
               </div>
 
-              {/* Expense info */}
-              {hasExpenses && day.isCurrentMonth && (
-                <div className="space-y-1">
-                  <div className="text-xs font-semibold text-red-600 dark:text-red-400">
-                    {formatCurrency(day.total)}
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    {day.expenses.length} gasto{day.expenses.length !== 1 ? 's' : ''}
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+            );
+
+          })}
+
+        </div>
 
       {/* Legend */}
       <div className="mt-4 flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-400">

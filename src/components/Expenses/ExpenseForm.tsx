@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Expense } from '../../types';
 import { useCategories } from '../../hooks/useCategories';
+import { useAccountStore } from '../../stores/useAccountStore';
 import { formatDateForInput } from '../../utils/formatters';
 
 interface ExpenseFormProps {
@@ -15,16 +16,24 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [category, setCategory] = useState('');
   const [subcategory, setSubcategory] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('Credit Card');
+  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'debit' | 'credit' | 'transfer' | 'other'>('cash');
+  const [accountId, setAccountId] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [recurring, setRecurring] = useState(false);
 
   const { categories } = useCategories();
+  const { accounts, creditCards, loadAccounts, loadCreditCards } = useAccountStore();
   const expenseCategories = categories.filter(c => c.type === 'expense');
 
   // Get selected category details
   const selectedCategory = expenseCategories.find(c => c.name === category);
+
+  // Load accounts and credit cards
+  useEffect(() => {
+    loadAccounts();
+    loadCreditCards();
+  }, [loadAccounts, loadCreditCards]);
 
   // Initialize form with expense data if editing
   useEffect(() => {
@@ -35,6 +44,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
       setCategory(expense.category);
       setSubcategory(expense.subcategory || '');
       setPaymentMethod(expense.paymentMethod);
+      setAccountId(expense.accountId || '');
       setTags(expense.tags || []);
       setRecurring(expense.recurring || false);
     }
@@ -66,15 +76,20 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
       return;
     }
 
+    const now = new Date();
+    const timezoneOffset = new Date().getTimezoneOffset() * 60000;
     onAddExpense({
-      date: new Date(date),
+      date: new Date(new Date(date).getTime() + timezoneOffset),
       amount: parseFloat(amount),
       category,
       subcategory: subcategory || undefined,
       description,
       paymentMethod,
+      accountId: accountId || undefined,
       tags: tags.length > 0 ? tags : undefined,
       recurring,
+      createdAt: expense?.createdAt || now,
+      updatedAt: now,
     });
 
     // Reset form if not editing
@@ -84,7 +99,8 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
       setDate(new Date().toISOString().split('T')[0]);
       setCategory('');
       setSubcategory('');
-      setPaymentMethod('Credit Card');
+      setPaymentMethod('cash');
+      setAccountId('');
       setTags([]);
       setRecurring(false);
     }
@@ -192,25 +208,58 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
         </div>
       </div>
 
-      {/* Payment Method */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Método de Pago *
-        </label>
-        <select
-          value={paymentMethod}
-          onChange={(e) => setPaymentMethod(e.target.value)}
-          className="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary-DEFAULT focus:border-transparent"
-          required
-        >
-          <option>Credit Card</option>
-          <option>Debit Card</option>
-          <option>Cash</option>
-          <option>Bank Transfer</option>
-          <option>Nu</option>
-          <option>Didi</option>
-          <option>MercadoPago</option>
-        </select>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Payment Method */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Método de Pago *
+          </label>
+          <select
+            value={paymentMethod}
+            onChange={(e) => {
+              setPaymentMethod(e.target.value as 'cash' | 'debit' | 'credit' | 'transfer' | 'other');
+              setAccountId(''); // Reset account when payment method changes
+            }}
+            className="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary-DEFAULT focus:border-transparent"
+            required
+          >
+            <option value="cash">Efectivo</option>
+            <option value="debit">Tarjeta de Débito</option>
+            <option value="credit">Tarjeta de Crédito</option>
+            <option value="transfer">Transferencia</option>
+            <option value="other">Otro</option>
+          </select>
+        </div>
+
+        {/* Account/Card Selector - Show only for debit, credit, or transfer */}
+        {(paymentMethod === 'debit' || paymentMethod === 'credit' || paymentMethod === 'transfer') && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {paymentMethod === 'credit' ? 'Tarjeta de Crédito' : 'Cuenta Bancaria'} *
+            </label>
+            <select
+              value={accountId}
+              onChange={(e) => setAccountId(e.target.value)}
+              className="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary-DEFAULT focus:border-transparent"
+              required
+            >
+              <option value="">Seleccionar {paymentMethod === 'credit' ? 'tarjeta' : 'cuenta'}</option>
+              {paymentMethod === 'credit' ? (
+                creditCards.map(card => (
+                  <option key={card.id} value={card.id}>
+                    {card.bank} {card.cardName} ****{card.lastFourDigits}
+                  </option>
+                ))
+              ) : (
+                accounts.filter(a => a.isActive).map(account => (
+                  <option key={account.id} value={account.id}>
+                    {account.bank} ****{account.accountNumber} ({account.accountType})
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
+        )}
       </div>
 
       {/* Tags */}
@@ -230,7 +279,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
           <button
             type="button"
             onClick={handleAddTag}
-            className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-500"
+            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-900 dark:text-gray-100 rounded hover:bg-gray-400 dark:hover:bg-gray-500 font-medium"
           >
             Agregar
           </button>
@@ -240,7 +289,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
             {tags.map((tag, index) => (
               <span
                 key={index}
-                className="inline-flex items-center gap-1 px-2 py-1 text-sm rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                className="inline-flex items-center gap-1 px-2 py-1 text-sm rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-white"
               >
                 #{tag}
                 <button

@@ -39,7 +39,7 @@ export const IncomeList: React.FC<IncomeListProps> = ({ incomes, onDeleteIncome,
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-500">{formatDate(income.date)}</p>
             {income.recurring && (
-              <span className="inline-block mt-1 px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+              <span className="inline-block mt-1 px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-white rounded">
                 Recurring
               </span>
             )}

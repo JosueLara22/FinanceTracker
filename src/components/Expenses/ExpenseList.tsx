@@ -41,7 +41,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                     {expense.description}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-primary-light dark:bg-primary-dark text-primary-dark dark:text-primary-light">
+                    <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-primary-light dark:bg-primary-dark text-primary-dark dark:text-white">
                       {expense.category}
                     </span>
                     {expense.subcategory && (
@@ -60,7 +60,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                       {expense.tags.map((tag, index) => (
                         <span
                           key={index}
-                          className="inline-block px-2 py-0.5 text-xs rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                          className="inline-block px-2 py-0.5 text-xs rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-white"
                         >
                           #{tag}
                         </span>
