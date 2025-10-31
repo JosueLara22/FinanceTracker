@@ -1,32 +1,60 @@
-
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Dashboard } from './components/Dashboard';
 import { Expenses } from './components/Expenses';
 import { Investments } from './components/Investments';
-import { Accounts } from './components/Accounts'; // Import actual Accounts component
-import { useCategories } from './hooks/useCategories';
-import { useExpenses } from './hooks/useExpenses';
-import { defaultCategories } from './data/defaults';
+import { Accounts } from './components/Accounts';
+import { Income } from './components/Income';
 import { ExpenseForm } from './components/Expenses/ExpenseForm';
+import { IncomeForm } from './components/Income/IncomeForm';
 import { Header } from './components/common/Header';
-import { useTheme } from './hooks/useTheme';
-import { Categories } from './components/Categories'; // Import actual Categories component
+import { Categories } from './components/Categories';
+import {
+  initializeStores,
+  useExpenseStore,
+  useIncomeStore,
+  useUIStore
+} from './stores';
 
 function App() {
-  const { categories, addCategory } = useCategories();
-  const { addExpense } = useExpenses();
   const [isExpenseFormOpen, setExpenseFormOpen] = useState(false);
-  const { theme } = useTheme();
+  const [isIncomeFormOpen, setIncomeFormOpen] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Zustand stores
+  const addExpense = useExpenseStore((state) => state.addExpense);
+  const addIncome = useIncomeStore((state) => state.addIncome);
+  const isLoading = useUIStore((state) => state.isLoading);
+  const setLoading = useUIStore((state) => state.setLoading);
 
   useEffect(() => {
-    // Seed database with default categories if none exist
-    if (categories.length === 0) {
-      defaultCategories.forEach(category => {
-        addCategory(category);
-      });
-    }
-  }, [categories, addCategory]);
+    // Initialize all stores on app mount
+    const initialize = async () => {
+      setLoading(true);
+      try {
+        await initializeStores();
+        setIsInitialized(true);
+      } catch (error) {
+        console.error('Failed to initialize stores:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initialize();
+  }, [setLoading]);
+
+  // Show loading screen while initializing
+  if (!isInitialized || isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading Financial Tracker...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Router>
@@ -34,10 +62,11 @@ function App() {
         <Header />
         <div className="container mx-auto p-4">
           <Routes>
-            <Route path="/" element={<Dashboard onAddExpenseClick={() => setExpenseFormOpen(true)} />} />
+            <Route path="/" element={<Dashboard onAddExpenseClick={() => setExpenseFormOpen(true)} onAddIncomeClick={() => setIncomeFormOpen(true)} />} />
             <Route path="/expenses" element={<Expenses />} />
             <Route path="/investments" element={<Investments />} />
             <Route path="/accounts" element={<Accounts />} />
+            <Route path="/income" element={<Income />} />
             <Route path="/categories" element={<Categories />} />
           </Routes>
         </div>
@@ -46,11 +75,25 @@ function App() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg">
               <ExpenseForm 
-                onAddExpense={(expense) => {
-                  addExpense(expense);
+                onAddExpense={async (expense) => {
+                  await addExpense(expense);
                   setExpenseFormOpen(false);
                 }}
                 onClose={() => setExpenseFormOpen(false)} 
+              />
+            </div>
+          </div>
+        )}
+
+        {isIncomeFormOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg">
+              <IncomeForm 
+                onAddIncome={(income) => {
+                  addIncome(income);
+                  setIncomeFormOpen(false);
+                }}
+                onClose={() => setIncomeFormOpen(false)} 
               />
             </div>
           </div>

@@ -1,5 +1,16 @@
 
-import { Category } from '../types';
+import { Category, UserSettings } from '../types';
+
+export const initialUserSettings: UserSettings = {
+  id: '1',
+  name: 'Guest',
+  currency: 'MXN',
+  language: 'es',
+  dateFormat: 'YYYY-MM-DD',
+  enableNotifications: true,
+  enableBiometricLock: false,
+  theme: 'auto',
+};
 
 export const defaultCategories: Omit<Category, 'id'>[] = [
   // Expenses

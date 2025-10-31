@@ -1,5 +1,16 @@
 // Core Data Models for Financial Tracker
 
+export interface Income {
+  id: string;
+  date: Date;
+  amount: number;
+  category: string; // e.g., Salary, Freelance, Gift, Investment Income
+  description: string;
+  source: string; // e.g., Employer, Client, Bank
+  recurring?: boolean;
+  attachments?: string[]; // e.g., pay stubs
+}
+
 export interface Expense {
   id: string;
   date: Date;
@@ -107,6 +118,7 @@ export interface UIState {
 export interface AppState {
   user: UserSettings;
   expenses: Expense[];
+  incomes: Income[];
   investments: Investment[];
   accounts: BankAccount[];
   creditCards: CreditCard[];
@@ -123,6 +135,12 @@ export type ActionType =
   | { type: 'UPDATE_EXPENSE'; payload: Expense }
   | { type: 'DELETE_EXPENSE'; payload: string }
   | { type: 'SET_EXPENSES'; payload: Expense[] }
+
+  // Income Actions
+  | { type: 'ADD_INCOME'; payload: Income }
+  | { type: 'UPDATE_INCOME'; payload: Income }
+  | { type: 'DELETE_INCOME'; payload: string }
+  | { type: 'SET_INCOMES'; payload: Income[] }
 
   // Investment Actions
   | { type: 'ADD_INVESTMENT'; payload: Investment }

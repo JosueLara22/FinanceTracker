@@ -24,6 +24,9 @@ export const Header = () => {
           <NavLink to="/expenses" className={navLinkClasses}>
             Expenses
           </NavLink>
+          <NavLink to="/income" className={navLinkClasses}>
+            Income
+          </NavLink>
           <NavLink to="/investments" className={navLinkClasses}>
             Investments
           </NavLink>

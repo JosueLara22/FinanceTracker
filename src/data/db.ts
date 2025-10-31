@@ -1,10 +1,11 @@
 import Dexie, { Table } from 'dexie';
-import { 
-  Expense, 
-  Investment, 
-  BankAccount, 
-  CreditCard, 
-  Budget, 
+import {
+  Expense,
+  Income,
+  Investment,
+  BankAccount,
+  CreditCard,
+  Budget,
   SavingsGoal,
   Category,
   UserSettings
@@ -12,6 +13,7 @@ import {
 
 export class FinancialDatabase extends Dexie {
   expenses!: Table<Expense, string>;
+  incomes!: Table<Income, string>;
   investments!: Table<Investment, string>;
   accounts!: Table<BankAccount, string>;
   creditCards!: Table<CreditCard, string>;
@@ -24,6 +26,7 @@ export class FinancialDatabase extends Dexie {
     super('FinancialTrackerDB');
     this.version(1).stores({
       expenses: 'id, date, category, paymentMethod',
+      incomes: 'id, date, category, source',
       investments: 'id, platform, type',
       accounts: 'id, bank, accountType',
       creditCards: 'id, bank, cardName',
