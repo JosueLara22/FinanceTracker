@@ -104,11 +104,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onAddExpenseClick }) => {
         <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2">Quick Actions</h3>
             <div className="flex space-x-4">
+
                 <button onClick={onAddExpenseClick} className="bg-purple-600 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700 transition-colors">
                     Add Expense
-                </button>
-                <button className="bg-gray-300 text-gray-500 px-4 py-2 rounded-lg shadow cursor-not-allowed" disabled>
-                    Quick Transfer
                 </button>
                 <button className="bg-gray-300 text-gray-500 px-4 py-2 rounded-lg shadow cursor-not-allowed" disabled>
                     Update Investment Returns
