@@ -38,12 +38,12 @@ export const InvestmentChart: React.FC<InvestmentChartProps> = ({ investments })
     const today = new Date();
     
     const data = [];
-    let currentDate = firstDate;
+    const currentDate = new Date(firstDate);
 
     // This is a simulation of daily values. For a real app, you'd store historical data.
     while (currentDate <= today) {
       const dateString = currentDate.toLocaleDateString('en-CA'); // YYYY-MM-DD
-      const dailyData: { [key: string]: any } = { date: dateString };
+      const dailyData: { [key: string]: number | string } = { date: dateString };
 
       investments.forEach(inv => {
         const startDate = new Date(inv.startDate);
@@ -51,7 +51,7 @@ export const InvestmentChart: React.FC<InvestmentChartProps> = ({ investments })
           const daysDiff = Math.floor((currentDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
           // Simplified simulation of compound growth
           const value = inv.initialCapital * Math.pow(1 + inv.gatPercentage / 100 / 365, daysDiff);
-          dailyData[inv.platform] = (dailyData[inv.platform] || 0) + value;
+          dailyData[inv.platform] = (dailyData[inv.platform] as number || 0) + value;
         }
       });
 

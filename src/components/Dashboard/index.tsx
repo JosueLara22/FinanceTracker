@@ -19,10 +19,10 @@ interface DashboardCardProps {
 }
 
 const DashboardCard: React.FC<DashboardCardProps> = ({ title, value, description }) => (
-  <div className="bg-white p-6 rounded-lg shadow-md">
-    <h3 className="text-gray-500 text-sm font-semibold">{title}</h3>
-    <p className="text-3xl font-bold text-purple-700 my-2">{value}</p>
-    <p className="text-gray-400 text-xs">{description}</p>
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+    <h3 className="text-gray-500 dark:text-gray-400 text-sm font-semibold">{title}</h3>
+    <p className="text-3xl font-bold text-purple-700 dark:text-purple-400 my-2">{value}</p>
+    <p className="text-gray-400 dark:text-gray-500 text-xs">{description}</p>
   </div>
 );
 
@@ -117,19 +117,19 @@ export const Dashboard: React.FC<DashboardProps> = ({ onAddExpenseClick }) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="font-semibold mb-4">Expense Trend (Last 6 Months)</h3>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                <h3 className="font-semibold mb-4 dark:text-gray-300">Expense Trend (Last 6 Months)</h3>
                 <ExpenseChart expenses={expenses} />
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="font-semibold mb-4">Category Breakdown</h3>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                <h3 className="font-semibold mb-4 dark:text-gray-300">Category Breakdown</h3>
                 <CategoryChart expenses={expenses} />
             </div>
         </div>
 
         <div className="mt-6">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="font-semibold mb-4">Investment Performance</h3>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                <h3 className="font-semibold mb-4 dark:text-gray-300">Investment Performance</h3>
                 <InvestmentChart investments={investments} />
             </div>
         </div>

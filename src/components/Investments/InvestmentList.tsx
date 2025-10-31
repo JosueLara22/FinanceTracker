@@ -59,37 +59,37 @@ export const InvestmentList: React.FC<InvestmentListProps> = ({ investments, onU
           : 0;
 
         return (
-          <div key={investment.id} className="bg-white p-4 rounded-lg shadow-md flex flex-col justify-between">
+          <div key={investment.id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex flex-col justify-between">
             <div>
               <div className="flex justify-between items-start">
-                <h3 className="font-bold text-xl">{investment.platform}</h3>
-                <span className="text-sm font-semibold text-gray-600 bg-gray-200 px-2 py-1 rounded-full">{investment.type}</span>
+                <h3 className="font-bold text-xl dark:text-gray-300">{investment.platform}</h3>
+                <span className="text-sm font-semibold text-gray-600 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 px-2 py-1 rounded-full">{investment.type}</span>
               </div>
-              <p className="text-sm text-gray-500">Started: {new Date(investment.startDate).toLocaleDateString('es-MX')}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-500">Started: {new Date(investment.startDate).toLocaleDateString('es-MX')}</p>
             </div>
             
-            <div className="my-4">
+            <div className="my-4 text-gray-800 dark:text-gray-300">
               <div className="flex justify-between">
                 <span>Initial Capital:</span>
                 <span className="font-semibold">{formatCurrency(investment.initialCapital)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Current Value:</span>
-                <span className="font-bold text-2xl text-green-600">{formatCurrency(investment.currentValue)}</span>
+                <span className="font-bold text-2xl text-green-600 dark:text-green-400">{formatCurrency(investment.currentValue)}</span>
               </div>
                <div className="flex justify-between">
                 <span>Accumulated Returns:</span>
-                <span className="font-semibold text-green-500">{formatCurrency(investment.accumulatedReturns)}</span>
+                <span className="font-semibold text-green-500 dark:text-green-400">{formatCurrency(investment.accumulatedReturns)}</span>
               </div>
               <div className="flex justify-between">
                 <span>ROI:</span>
-                <span className={`font-bold ${roi >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                <span className={`font-bold ${roi >= 0 ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
                   {roi.toFixed(2)}%
                 </span>
               </div>
             </div>
 
-            <div className="text-sm">
+            <div className="text-sm text-gray-800 dark:text-gray-300">
               <div className="flex justify-between">
                 <span>GAT:</span>
                 <span className="font-semibold">{investment.gatPercentage.toFixed(2)}%</span>

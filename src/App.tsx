@@ -7,11 +7,14 @@ import { useCategories } from './hooks/useCategories';
 import { useExpenses } from './hooks/useExpenses';
 import { defaultCategories } from './data/defaults';
 import { ExpenseForm } from './components/Expenses/ExpenseForm';
+import { Header } from './components/common/Header';
+import { useTheme } from './hooks/useTheme';
 
 function App() {
   const { categories, addCategory } = useCategories();
   const { addExpense } = useExpenses();
   const [isExpenseFormOpen, setExpenseFormOpen] = useState(false);
+  const { theme } = useTheme();
 
   useEffect(() => {
     // Seed database with default categories if none exist
@@ -23,12 +26,8 @@ function App() {
   }, [categories, addCategory]);
 
   return (
-    <main className="bg-gray-100 min-h-screen">
-      <header className="bg-white shadow-md">
-        <nav className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-purple-700">Financial Tracker</h1>
-        </nav>
-      </header>
+    <main className={`bg-gray-100 dark:bg-gray-900 min-h-screen`}>
+      <Header />
       <div className="container mx-auto p-4">
         <Dashboard onAddExpenseClick={() => setExpenseFormOpen(true)} />
         <Expenses />
@@ -37,7 +36,7 @@ function App() {
 
       {isExpenseFormOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg">
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg">
             <ExpenseForm 
               onAddExpense={(expense) => {
                 addExpense(expense);

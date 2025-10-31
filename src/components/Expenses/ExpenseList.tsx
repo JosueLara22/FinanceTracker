@@ -3,11 +3,10 @@ import { Expense } from '../../types';
 
 interface ExpenseListProps {
   expenses: Expense[];
-  onUpdateExpense: (id: string, updates: Partial<Expense>) => void;
   onDeleteExpense: (id: string) => void;
 }
 
-export const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onUpdateExpense, onDeleteExpense }) => {
+export const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onDeleteExpense }) => {
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-MX', { 
@@ -31,11 +30,11 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onUpdateExpe
   return (
     <div className="space-y-4">
       {expenses.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(expense => (
-        <div key={expense.id} className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
+        <div key={expense.id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex justify-between items-center">
           <div>
-            <p className="font-bold text-lg">{expense.description}</p>
-            <p className="text-sm text-gray-600">{expense.category}</p>
-            <p className="text-sm text-gray-500">{formatDate(expense.date)}</p>
+            <p className="font-bold text-lg dark:text-gray-300">{expense.description}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{expense.category}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-500">{formatDate(expense.date)}</p>
           </div>
           <div className="text-right">
             <p className="font-bold text-xl text-red-500">{formatCurrency(expense.amount)}</p>
