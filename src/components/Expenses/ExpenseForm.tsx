@@ -1,66 +1,85 @@
 import React, { useState } from 'react';
-import { useAppContext } from '../../contexts/AppContext';
 import { Expense } from '../../types';
+import { useCategories } from '../../hooks/useCategories';
 
-const ExpenseForm = () => {
-  const { addExpense } = useAppContext();
-  const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState('');
+interface ExpenseFormProps {
+  onAddExpense: (expense: Omit<Expense, 'id'>) => void;
+  onClose?: () => void;
+}
+
+export const ExpenseForm: React.FC<ExpenseFormProps> = ({ onAddExpense, onClose }) => {
   const [description, setDescription] = useState('');
+  const [amount, setAmount] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [category, setCategory] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('Credit Card');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const { categories } = useCategories();
+  const expenseCategories = categories.filter(c => c.type === 'expense');
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount || !category || !description) {
-      alert('Please fill all fields');
+    if (!description || !amount || !date || !category) {
+      alert('Please fill out all fields.');
       return;
     }
 
-    const newExpense: Omit<Expense, 'id'> = {
-      date: new Date(),
+    onAddExpense({
+      date: new Date(date),
       amount: parseFloat(amount),
       category,
       description,
       paymentMethod,
-    };
-
-    await addExpense(newExpense);
+    });
 
     // Reset form
-    setAmount('');
-    setCategory('');
     setDescription('');
+    setAmount('');
+    setDate(new Date().toISOString().split('T')[0]);
+    setCategory('');
+    setPaymentMethod('Credit Card');
+
+    onClose?.(); // Close the modal on successful submission
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md mb-8">
-      <h3 className="text-xl font-semibold text-gray-800 mb-4">Agregar Nuevo Gasto</h3>
+    <form onSubmit={handleSubmit} className="p-4 mb-4 bg-white shadow-md rounded-lg">
+      <h2 className="text-xl font-bold mb-4">Add New Expense</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
-          type="number"
-          placeholder="Monto (e.g., 150.50)"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-        <input
           type="text"
-          placeholder="Categoría (e.g., Comida)"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-        <input
-          type="text"
-          placeholder="Descripción (e.g., Café con amigos)"
+          placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary md:col-span-2"
+          className="p-2 border rounded w-full"
         />
-        <select 
-          value={paymentMethod} 
-          onChange={e => setPaymentMethod(e.target.value)}
-          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+        <input
+          type="number"
+          placeholder="Amount (MXN)"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="p-2 border rounded w-full"
+        />
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="p-2 border rounded w-full"
+        />
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="p-2 border rounded w-full"
+        >
+          <option value="" disabled>Select Category</option>
+          {expenseCategories.map(c => (
+            <option key={c.id} value={c.name}>{c.name}</option>
+          ))}
+        </select>
+         <select
+          value={paymentMethod}
+          onChange={(e) => setPaymentMethod(e.target.value)}
+          className="p-2 border rounded w-full"
         >
           <option>Credit Card</option>
           <option>Debit Card</option>
@@ -71,11 +90,14 @@ const ExpenseForm = () => {
           <option>MercadoPago</option>
         </select>
       </div>
-      <button type="submit" className="mt-6 w-full bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-colors">
-        + Agregar Gasto
-      </button>
+      <div className="mt-4 flex justify-end space-x-4">
+        <button type="button" onClick={onClose} className="bg-gray-300 text-gray-800 p-2 rounded hover:bg-gray-400">
+          Cancel
+        </button>
+        <button type="submit" className="bg-purple-600 text-white p-2 rounded hover:bg-purple-700">
+          Add Expense
+        </button>
+      </div>
     </form>
   );
 };
-
-export default ExpenseForm;

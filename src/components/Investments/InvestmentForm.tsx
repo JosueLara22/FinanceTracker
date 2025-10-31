@@ -1,51 +1,61 @@
 import React, { useState } from 'react';
-import { useAppContext } from '../../contexts/AppContext';
 import { Investment } from '../../types';
 
-const InvestmentForm = () => {
-  const { addInvestment } = useAppContext(); // This will be added to the context
-  const [platform, setPlatform] = useState<'Nu' | 'Didi' | 'MercadoPago' | 'Other'>('Nu');
-  const [initialCapital, setInitialCapital] = useState('');
-  const [gatPercentage, setGatPercentage] = useState('');
+interface InvestmentFormProps {
+  onAddInvestment: (investment: Omit<Investment, 'id'>) => void;
+}
 
-  const handleSubmit = async (e: React.FormEvent) => {
+export const InvestmentForm: React.FC<InvestmentFormProps> = ({ onAddInvestment }) => {
+  const [platform, setPlatform] = useState<'Nu' | 'Didi' | 'MercadoPago' | 'Other'>('Nu');
+  const [type, setType] = useState('Cajita');
+  const [initialCapital, setInitialCapital] = useState('');
+  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [gatPercentage, setGatPercentage] = useState('');
+  const [autoReinvest, setAutoReinvest] = useState(true);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!initialCapital || !gatPercentage) {
-      alert('Please fill all fields');
+    if (!platform || !initialCapital || !startDate || !gatPercentage) {
+      alert('Please fill out all required fields.');
       return;
     }
 
     const capital = parseFloat(initialCapital);
     const gat = parseFloat(gatPercentage);
 
-    const newInvestment: Omit<Investment, 'id'> = {
-      platform,
-      type: 'Cajita', // Default type for now
-      initialCapital: capital,
-      startDate: new Date(),
-      gatPercentage: gat,
-      dailyReturn: (capital * (gat / 100)) / 365,
-      accumulatedReturns: 0,
-      currentValue: capital,
-      lastUpdate: new Date(),
-      autoReinvest: true,
-    };
+    // Per spec, some fields are calculated
+    const dailyReturn = (capital * (gat / 100)) / 365;
+    const now = new Date();
 
-    await addInvestment(newInvestment);
+    onAddInvestment({
+      platform,
+      type,
+      initialCapital: capital,
+      startDate: new Date(startDate),
+      gatPercentage: gat,
+      dailyReturn,
+      accumulatedReturns: 0, // Will be calculated over time
+      currentValue: capital, // Starts with initial capital
+      lastUpdate: now,
+      autoReinvest,
+    });
 
     // Reset form
+    setPlatform('Nu');
+    setType('Cajita');
     setInitialCapital('');
+    setStartDate(new Date().toISOString().split('T')[0]);
     setGatPercentage('');
+    setAutoReinvest(true);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md mb-8">
-      <h3 className="text-xl font-semibold text-gray-800 mb-4">Agregar Nueva Inversión</h3>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <select 
-          value={platform} 
-          onChange={e => setPlatform(e.target.value as any)}
-          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+    <form onSubmit={handleSubmit} className="p-4 mb-4 bg-white shadow-md rounded-lg">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <select
+          value={platform}
+          onChange={(e) => setPlatform(e.target.value as any)}
+          className="p-2 border rounded w-full"
         >
           <option value="Nu">Nu</option>
           <option value="Didi">Didi</option>
@@ -53,26 +63,47 @@ const InvestmentForm = () => {
           <option value="Other">Other</option>
         </select>
         <input
+          type="text"
+          placeholder="Type (e.g., Cajita, Inversión)"
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+          className="p-2 border rounded w-full"
+        />
+        <input
           type="number"
-          placeholder="Capital Inicial (e.g., 10000)"
+          placeholder="Initial Capital (MXN)"
           value={initialCapital}
           onChange={(e) => setInitialCapital(e.target.value)}
-          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          className="p-2 border rounded w-full"
         />
         <input
           type="number"
           step="0.01"
-          placeholder="GAT Anual % (e.g., 15.00)"
+          placeholder="GAT % (Annual)"
           value={gatPercentage}
           onChange={(e) => setGatPercentage(e.target.value)}
-          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          className="p-2 border rounded w-full"
         />
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          className="p-2 border rounded w-full"
+        />
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id="autoReinvest"
+            checked={autoReinvest}
+            onChange={(e) => setAutoReinvest(e.target.checked)}
+            className="mr-2 h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="autoReinvest">Auto-reinvest?</label>
+        </div>
       </div>
-      <button type="submit" className="mt-6 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-        + Agregar Inversión
+      <button type="submit" className="mt-4 w-full bg-purple-600 text-white p-2 rounded hover:bg-purple-700">
+        Add Investment
       </button>
     </form>
   );
 };
-
-export default InvestmentForm;

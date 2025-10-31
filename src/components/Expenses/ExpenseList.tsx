@@ -1,38 +1,51 @@
 import React from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../data/db';
 import { Expense } from '../../types';
 
-const ExpenseItem = ({ expense }: { expense: Expense }) => (
-  <div className="bg-gray-50 p-4 rounded-lg flex justify-between items-center border-b border-gray-200">
-    <div>
-      <p className="font-semibold text-gray-800">{expense.description}</p>
-      <p className="text-sm text-gray-500">{expense.category} - {new Date(expense.date).toLocaleDateString()}</p>
-    </div>
-    <div className="text-right">
-      <p className="font-bold text-red-500">-${expense.amount.toLocaleString('es-MX')}</p>
-      <p className="text-xs text-gray-400">{expense.paymentMethod}</p>
-    </div>
-  </div>
-);
+interface ExpenseListProps {
+  expenses: Expense[];
+  onUpdateExpense: (id: string, updates: Partial<Expense>) => void;
+  onDeleteExpense: (id: string) => void;
+}
 
-const ExpenseList = () => {
-  const expenses = useLiveQuery(() => db.expenses.orderBy('date').reverse().toArray());
+export const ExpenseList: React.FC<ExpenseListProps> = ({ expenses, onUpdateExpense, onDeleteExpense }) => {
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('es-MX', { 
+      style: 'currency', 
+      currency: 'MXN' 
+    }).format(amount);
+  };
+
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleDateString('es-MX', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  if (expenses.length === 0) {
+    return <p className="text-center text-gray-500">No expenses recorded yet. Add one to get started!</p>;
+  }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h3 className="text-xl font-semibold text-gray-800 mb-4">Gastos Recientes</h3>
-      <div className="space-y-4">
-        {expenses && expenses.length > 0 ? (
-          expenses.map(expense => (
-            <ExpenseItem key={expense.id} expense={expense} />
-          ))
-        ) : (
-          <p className="text-gray-500 text-center py-4">No hay gastos registrados todavía.</p>
-        )}
-      </div>
+    <div className="space-y-4">
+      {expenses.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(expense => (
+        <div key={expense.id} className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
+          <div>
+            <p className="font-bold text-lg">{expense.description}</p>
+            <p className="text-sm text-gray-600">{expense.category}</p>
+            <p className="text-sm text-gray-500">{formatDate(expense.date)}</p>
+          </div>
+          <div className="text-right">
+            <p className="font-bold text-xl text-red-500">{formatCurrency(expense.amount)}</p>
+            <div className="flex items-center space-x-2 justify-end mt-2">
+              
+              <button onClick={() => onDeleteExpense(expense.id)} className="text-sm text-red-500 hover:underline">Delete</button>
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
-
-export default ExpenseList;

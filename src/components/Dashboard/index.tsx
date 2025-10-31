@@ -1,72 +1,138 @@
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../data/db';
-import ExpenseChart from './ExpenseChart';
-import CategoryChart from './CategoryChart';
 
-const Dashboard = () => {
-    const expenses = useLiveQuery(() => db.expenses.toArray());
-    const investments = useLiveQuery(() => db.investments.toArray());
-    const accounts = useLiveQuery(() => db.accounts.toArray());
-    const creditCards = useLiveQuery(() => db.creditCards.toArray());
+import React, { useMemo } from 'react';
+import { useExpenses } from '../../hooks/useExpenses';
+import { useInvestments } from '../../hooks/useInvestments';
+import { useAccounts } from '../../hooks/useAccounts';
+import { useCreditCards } from '../../hooks/useCreditCards';
+import { CategoryChart } from './CategoryChart';
+import { ExpenseChart } from './ExpenseChart';
+import { InvestmentChart } from './InvestmentChart';
 
-    const totalExpenses = expenses?.reduce((sum, expense) => sum + expense.amount, 0) ?? 0;
-    const totalInvestments = investments?.reduce((sum, investment) => sum + investment.currentValue, 0) ?? 0;
-    const totalBankAccounts = accounts?.reduce((sum, account) => sum + account.balance, 0) ?? 0;
-    const totalCreditCardDebt = creditCards?.reduce((sum, card) => sum + card.currentBalance, 0) ?? 0;
-    const netWorth = totalBankAccounts + totalInvestments - totalCreditCardDebt;
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
+};
 
-    return (
-        <div>
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-                    Dashboard Principal
-                </h2>
-                <p className="text-gray-600 mb-4">
-                    Resumen de tus finanzas personales.
-                </p>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                    {/* Quick Stats Cards */}
-                    <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg p-6 shadow-md">
-                        <h3 className="text-lg font-semibold mb-2">Gastos del Mes</h3>
-                        <p className="text-3xl font-bold">${totalExpenses.toLocaleString('es-MX')}</p>
-                        <p className="text-sm opacity-90 mt-1">MXN</p>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg p-6 shadow-md">
-                        <h3 className="text-lg font-semibold mb-2">Inversiones</h3>
-                        <p className="text-3xl font-bold">${totalInvestments.toLocaleString('es-MX')}</p>
-                        <p className="text-sm opacity-90 mt-1">MXN</p>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg p-6 shadow-md">
-                        <h3 className="text-lg font-semibold mb-2">Patrimonio Neto</h3>
-                        <p className="text-3xl font-bold">${netWorth.toLocaleString('es-MX')}</p>
-                        <p className="text-sm opacity-90 mt-1">MXN</p>
-                    </div>
-                </div>
-
-                <div className="mt-8">
-                    <h3 className="text-xl font-semibold text-gray-800 mb-3">Acciones Rápidas</h3>
-                    <div className="flex flex-wrap gap-3">
-                        <button className="bg-primary hover:bg-primary-dark text-white font-semibold py-2 px-4 rounded-lg transition-colors">
-                            + Agregar Gasto
-                        </button>
-                        <button className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
-                            + Nueva Inversión
-                        </button>
-                        <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
-                            Ver Reportes
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-                <ExpenseChart />
-                <CategoryChart />
-            </div>
-        </div>
-    )
+interface DashboardCardProps {
+  title: string;
+  value: string | number;
+  description: string;
 }
 
-export default Dashboard;
+const DashboardCard: React.FC<DashboardCardProps> = ({ title, value, description }) => (
+  <div className="bg-white p-6 rounded-lg shadow-md">
+    <h3 className="text-gray-500 text-sm font-semibold">{title}</h3>
+    <p className="text-3xl font-bold text-purple-700 my-2">{value}</p>
+    <p className="text-gray-400 text-xs">{description}</p>
+  </div>
+);
+
+interface DashboardProps {
+  onAddExpenseClick: () => void;
+}
+
+export const Dashboard: React.FC<DashboardProps> = ({ onAddExpenseClick }) => {
+  const { expenses } = useExpenses();
+  const { investments } = useInvestments();
+  const { accounts } = useAccounts();
+  const { creditCards } = useCreditCards();
+
+  /**
+   * Calculates and memoizes the core dashboard metrics.
+   * This prevents recalculation on every render unless the underlying data changes.
+   * @returns {{netWorth: number, investmentRoi: number, monthlyExpenses: number}} An object containing the calculated metrics.
+   */
+  const metrics = useMemo(() => {
+    // Calculate total assets from bank accounts and investments
+    const totalAssets = 
+      accounts.reduce((sum, acc) => sum + acc.balance, 0) + 
+      investments.reduce((sum, inv) => sum + inv.currentValue, 0);
+
+    // Calculate total liabilities from credit cards
+    const totalLiabilities = creditCards.reduce((sum, card) => sum + card.currentBalance, 0);
+
+    /**
+     * Net Worth: The total value of all assets minus all liabilities.
+     */
+    const netWorth = totalAssets - totalLiabilities;
+
+    // Calculate total investment capital and current value to determine ROI
+    const totalInvestmentCapital = investments.reduce((sum, inv) => sum + inv.initialCapital, 0);
+    const totalInvestmentValue = investments.reduce((sum, inv) => sum + inv.currentValue, 0);
+    
+    /**
+     * Investment ROI: The total return on investment across all investment accounts.
+     * Calculated as ((Current Value - Initial Capital) / Initial Capital) * 100.
+     */
+    const investmentRoi = totalInvestmentCapital > 0 
+      ? ((totalInvestmentValue - totalInvestmentCapital) / totalInvestmentCapital) * 100 
+      : 0;
+
+    /**
+     * Monthly Expenses: The sum of all expenses recorded in the current calendar month.
+     */
+    const monthlyExpenses = expenses
+      .filter(exp => new Date(exp.date).getMonth() === new Date().getMonth())
+      .reduce((sum, exp) => sum + exp.amount, 0);
+
+    return {
+      netWorth,
+      investmentRoi,
+      monthlyExpenses
+    };
+  }, [expenses, investments, accounts, creditCards]);
+
+  return (
+    <div className="p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+            <DashboardCard 
+                title="Net Worth" 
+                value={formatCurrency(metrics.netWorth)} 
+                description="Total Assets - Total Liabilities"
+            />
+            <DashboardCard 
+                title="Investment ROI" 
+                value={`${metrics.investmentRoi.toFixed(2)}%`} 
+                description="Total Return on Investment"
+            />
+            <DashboardCard 
+                title="Monthly Expenses" 
+                value={formatCurrency(metrics.monthlyExpenses)} 
+                description="Expenses this month"
+            />
+        </div>
+
+        <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2">Quick Actions</h3>
+            <div className="flex space-x-4">
+                <button onClick={onAddExpenseClick} className="bg-purple-600 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700 transition-colors">
+                    Add Expense
+                </button>
+                <button className="bg-gray-300 text-gray-500 px-4 py-2 rounded-lg shadow cursor-not-allowed" disabled>
+                    Quick Transfer
+                </button>
+                <button className="bg-gray-300 text-gray-500 px-4 py-2 rounded-lg shadow cursor-not-allowed" disabled>
+                    Update Investment Returns
+                </button>
+            </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="font-semibold mb-4">Expense Trend (Last 6 Months)</h3>
+                <ExpenseChart expenses={expenses} />
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="font-semibold mb-4">Category Breakdown</h3>
+                <CategoryChart expenses={expenses} />
+            </div>
+        </div>
+
+        <div className="mt-6">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="font-semibold mb-4">Investment Performance</h3>
+                <InvestmentChart investments={investments} />
+            </div>
+        </div>
+    </div>
+  );
+};

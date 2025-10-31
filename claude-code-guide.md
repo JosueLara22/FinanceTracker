@@ -94,7 +94,6 @@ Always emphasize:
 - GAT percentage for investments
 - Mexican fintech platforms (Nu, Didi, MercadoPago)
 - MXN currency formatting
-- Spanish labels (but keep code in English)
 
 ### 2. **Request Incremental Progress**
 Instead of: "Build the entire app"

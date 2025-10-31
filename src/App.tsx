@@ -1,41 +1,55 @@
-import Dashboard from './components/Dashboard';
-import Expenses from './components/Expenses';
-import Investments from './components/Investments';
+
+import React, { useEffect, useState } from 'react';
+import { Dashboard } from './components/Dashboard';
+import { Expenses } from './components/Expenses';
+import { Investments } from './components/Investments';
+import { useCategories } from './hooks/useCategories';
+import { useExpenses } from './hooks/useExpenses';
+import { defaultCategories } from './data/defaults';
+import { ExpenseForm } from './components/Expenses/ExpenseForm';
 
 function App() {
+  const { categories, addCategory } = useCategories();
+  const { addExpense } = useExpenses();
+  const [isExpenseFormOpen, setExpenseFormOpen] = useState(false);
+
+  useEffect(() => {
+    // Seed database with default categories if none exist
+    if (categories.length === 0) {
+      defaultCategories.forEach(category => {
+        addCategory(category);
+      });
+    }
+  }, [categories, addCategory]);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-primary to-primary-dark text-white shadow-lg">
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold">Rastreador Financiero</h1>
-          <p className="text-sm opacity-90 mt-1">Hola! Aquí está tu resumen financiero.</p>
-        </div>
+    <main className="bg-gray-100 min-h-screen">
+      <header className="bg-white shadow-md">
+        <nav className="container mx-auto px-4 py-4">
+          <h1 className="text-2xl font-bold text-purple-700">Financial Tracker</h1>
+        </nav>
       </header>
+      <div className="container mx-auto p-4">
+        <Dashboard onAddExpenseClick={() => setExpenseFormOpen(true)} />
+        <Expenses />
+        <Investments />
+      </div>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <Dashboard />
-
-        <div className="mt-8">
-          <Expenses />
+      {isExpenseFormOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg">
+            <ExpenseForm 
+              onAddExpense={(expense) => {
+                addExpense(expense);
+                setExpenseFormOpen(false);
+              }}
+              onClose={() => setExpenseFormOpen(false)} 
+            />
+          </div>
         </div>
-
-        <div className="mt-8">
-          <Investments />
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white mt-auto py-4">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-sm">
-            Financial Tracker © 2025 - Gestiona tus finanzas con inteligencia
-          </p>
-        </div>
-      </footer>
-    </div>
-  )
+      )}
+    </main>
+  );
 }
 
-export default App
+export default App;

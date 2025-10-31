@@ -1,57 +1,112 @@
 import React from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../data/db';
 import { Investment } from '../../types';
 
-const InvestmentCard = ({ investment }: { investment: Investment }) => {
-  const roi = ((investment.currentValue - investment.initialCapital) / investment.initialCapital) * 100;
+interface InvestmentListProps {
+  investments: Investment[];
+  onUpdateInvestment: (id: string, updates: Partial<Investment>) => void;
+  onDeleteInvestment: (id: string) => void;
+}
+
+export const InvestmentList: React.FC<InvestmentListProps> = ({ investments, onUpdateInvestment, onDeleteInvestment }) => {
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(amount);
+  };
+
+  /**
+   * Calculates and applies the investment returns from the last update until today.
+   * It calculates the number of days passed and iteratively applies daily interest.
+   * The interest calculation respects the 'autoReinvest' flag to switch between
+   * simple and compound interest.
+   * @param {Investment} investment The investment object to update.
+   */
+  const handleUpdateReturns = (investment: Investment) => {
+    const now = new Date();
+    const lastUpdate = new Date(investment.lastUpdate);
+    const timeDiff = now.getTime() - lastUpdate.getTime();
+    const daysPassed = Math.floor(timeDiff / (1000 * 3600 * 24));
+
+    if (daysPassed > 0) {
+      let newCurrentValue = investment.currentValue;
+      let newAccumulatedReturns = investment.accumulatedReturns;
+
+      for (let i = 0; i < daysPassed; i++) {
+        const dailyInterest = investment.autoReinvest 
+          ? (newCurrentValue * (investment.gatPercentage / 100)) / 365
+          : (investment.initialCapital * (investment.gatPercentage / 100)) / 365;
+        
+        newAccumulatedReturns += dailyInterest;
+        newCurrentValue += dailyInterest;
+      }
+
+      onUpdateInvestment(investment.id, {
+        currentValue: newCurrentValue,
+        accumulatedReturns: newAccumulatedReturns,
+        lastUpdate: now,
+      });
+    }
+  };
+
+  if (investments.length === 0) {
+    return <p className="text-center text-gray-500">No investments recorded yet. Add one to get started!</p>;
+  }
 
   return (
-    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-      <h4 className="font-bold text-lg text-primary">{investment.platform}</h4>
-      <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
-        <div>
-          <p className="text-gray-500">Capital Inicial</p>
-          <p className="font-semibold">${investment.initialCapital.toLocaleString('es-MX')}</p>
-        </div>
-        <div>
-          <p className="text-gray-500">Valor Actual</p>
-          <p className="font-semibold text-green-600">${investment.currentValue.toLocaleString('es-MX')}</p>
-        </div>
-        <div>
-          <p className="text-gray-500">GAT Anual</p>
-          <p className="font-semibold">{investment.gatPercentage.toFixed(2)}%</p>
-        </div>
-        <div>
-          <p className="text-gray-500">ROI</p>
-          <p className={`font-semibold ${roi >= 0 ? 'text-green-600' : 'text-red-600'}`}>{roi.toFixed(2)}%</p>
-        </div>
-        <div>
-          <p className="text-gray-500">Rendimiento Diario</p>
-          <p className="font-semibold">${investment.dailyReturn.toFixed(2)}</p>
-        </div>
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {investments.map(investment => {
+        const roi = investment.initialCapital > 0 
+          ? ((investment.currentValue - investment.initialCapital) / investment.initialCapital) * 100
+          : 0;
+
+        return (
+          <div key={investment.id} className="bg-white p-4 rounded-lg shadow-md flex flex-col justify-between">
+            <div>
+              <div className="flex justify-between items-start">
+                <h3 className="font-bold text-xl">{investment.platform}</h3>
+                <span className="text-sm font-semibold text-gray-600 bg-gray-200 px-2 py-1 rounded-full">{investment.type}</span>
+              </div>
+              <p className="text-sm text-gray-500">Started: {new Date(investment.startDate).toLocaleDateString('es-MX')}</p>
+            </div>
+            
+            <div className="my-4">
+              <div className="flex justify-between">
+                <span>Initial Capital:</span>
+                <span className="font-semibold">{formatCurrency(investment.initialCapital)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Current Value:</span>
+                <span className="font-bold text-2xl text-green-600">{formatCurrency(investment.currentValue)}</span>
+              </div>
+               <div className="flex justify-between">
+                <span>Accumulated Returns:</span>
+                <span className="font-semibold text-green-500">{formatCurrency(investment.accumulatedReturns)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>ROI:</span>
+                <span className={`font-bold ${roi >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {roi.toFixed(2)}%
+                </span>
+              </div>
+            </div>
+
+            <div className="text-sm">
+              <div className="flex justify-between">
+                <span>GAT:</span>
+                <span className="font-semibold">{investment.gatPercentage.toFixed(2)}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Daily Return (approx.):</span>
+                <span className="font-semibold">{formatCurrency(investment.dailyReturn)}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between mt-4">
+              <button onClick={() => handleUpdateReturns(investment)} className="text-sm text-blue-500 hover:underline">Update Returns</button>
+              <button onClick={() => onDeleteInvestment(investment.id)} className="text-sm text-red-500 hover:underline">Delete</button>
+            </div>
+          </div>
+        )
+      })}
     </div>
   );
 };
-
-const InvestmentList = () => {
-  const investments = useLiveQuery(() => db.investments.toArray());
-
-  return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h3 className="text-xl font-semibold text-gray-800 mb-4">Mis Inversiones</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {investments && investments.length > 0 ? (
-          investments.map(investment => (
-            <InvestmentCard key={investment.id} investment={investment} />
-          ))
-        ) : (
-          <p className="text-gray-500 text-center py-4 md:col-span-2">No hay inversiones registradas todavía.</p>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default InvestmentList;
