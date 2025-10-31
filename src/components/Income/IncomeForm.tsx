@@ -1,19 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Income } from '../../types';
 import { useCategories } from '../../hooks/useCategories';
 
 interface IncomeFormProps {
+  income?: Income;
   onAddIncome: (income: Omit<Income, 'id'>) => void;
   onClose?: () => void;
 }
 
-export const IncomeForm: React.FC<IncomeFormProps> = ({ onAddIncome, onClose }) => {
+export const IncomeForm: React.FC<IncomeFormProps> = ({ income, onAddIncome, onClose }) => {
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [category, setCategory] = useState('');
   const [source, setSource] = useState('');
   const [recurring, setRecurring] = useState(false);
+
+  // Pre-populate form when editing
+  useEffect(() => {
+    if (income) {
+      setDescription(income.description);
+      setAmount(income.amount.toString());
+      setDate(new Date(income.date).toISOString().split('T')[0]);
+      setCategory(income.category);
+      setSource(income.source);
+      setRecurring(income.recurring || false);
+    }
+  }, [income]);
 
   const { categories } = useCategories();
   const incomeCategories = categories.filter(c => c.type === 'income');
@@ -47,7 +60,7 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ onAddIncome, onClose }) 
 
   return (
     <form onSubmit={handleSubmit} className="p-4 mb-4 bg-white dark:bg-gray-800 shadow-md rounded-lg">
-      <h2 className="text-xl font-bold mb-4 dark:text-gray-300">Add New Income</h2>
+      <h2 className="text-xl font-bold mb-4 dark:text-gray-300">{income ? 'Edit Income' : 'Add New Income'}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input
           type="text"
@@ -102,7 +115,7 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ onAddIncome, onClose }) 
           Cancel
         </button>
         <button type="submit" className="bg-primary-DEFAULT text-white p-2 rounded-md hover:bg-primary-dark">
-          Add Income
+          {income ? 'Update Income' : 'Add Income'}
         </button>
       </div>
     </form>

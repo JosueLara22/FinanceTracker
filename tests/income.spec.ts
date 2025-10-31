@@ -9,8 +9,8 @@ test.describe('Income Tracking', () => {
   });
 
   test('should allow adding a new income entry', async ({ page }) => {
-    // Click the 'Add New Income' button to open the form
-    await page.getByRole('button', { name: 'Add New Income' }).click();
+    // Click the 'Agregar Ingreso' button to open the form
+    await page.getByRole('button', { name: 'Agregar Ingreso' }).click();
 
     // Fill the form
     await page.getByPlaceholder('Description').fill('Monthly salary');
@@ -19,7 +19,7 @@ test.describe('Income Tracking', () => {
     await page.locator('select').first().selectOption('Salary'); // 'Salary' is an existing income category
     await page.getByPlaceholder('Source (e.g., Employer, Client)').fill('Employer');
     // Submit the form
-    await page.locator('form').getByRole('button', { name: 'Add Income' }).click();
+    await page.locator('form').getByRole('button', { name: /Add Income|Update Income/ }).click();
     await page.waitForLoadState('networkidle');
 
     // Verify the income appears in the list
@@ -31,13 +31,13 @@ test.describe('Income Tracking', () => {
 
   test('should allow deleting an income entry', async ({ page }) => {
     // First, add an income entry to delete
-    await page.getByRole('button', { name: 'Add New Income' }).click();
+    await page.getByRole('button', { name: 'Agregar Ingreso' }).click();
     await page.getByPlaceholder('Description').fill('Birthday gift');
     await page.getByPlaceholder('Amount (MXN)').fill('200');
     await page.locator('input[type="date"]').fill('2023-10-20');
     await page.locator('select').first().selectOption('Gifts'); // Changed from 'Gift' to 'Gifts'
     await page.getByPlaceholder('Source (e.g., Employer, Client)').fill('Family');
-    await page.getByRole('button', { name: 'Add Income' }).click();
+    await page.getByRole('button', { name: /Add Income|Update Income/ }).click();
     await page.waitForLoadState('networkidle');
 
     // Verify it's added
@@ -70,7 +70,7 @@ test.describe('Income Tracking', () => {
     await page.getByPlaceholder('Source (e.g., Employer, Client)').fill('Client A'); // Changed source
 
     // Submit the form
-    await page.locator('form').getByRole('button', { name: 'Add Income' }).click();
+    await page.locator('form').getByRole('button', { name: /Add Income|Update Income/ }).click();
     await page.waitForLoadState('networkidle');
 
     // Go back to dashboard (form submission should close the modal and return to dashboard)
