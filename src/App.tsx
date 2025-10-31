@@ -1,12 +1,17 @@
-import { useAppContext } from './contexts/AppContext';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from './data/db';
+import Expenses from './components/Expenses';
 
 function App() {
-  const { state } = useAppContext();
+  const expenses = useLiveQuery(() => db.expenses.toArray());
+  const investments = useLiveQuery(() => db.investments.toArray());
+  const accounts = useLiveQuery(() => db.accounts.toArray());
+  const creditCards = useLiveQuery(() => db.creditCards.toArray());
 
-  const totalExpenses = state.expenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const totalInvestments = state.investments.reduce((sum, investment) => sum + investment.currentValue, 0);
-  const totalBankAccounts = state.accounts.reduce((sum, account) => sum + account.balance, 0);
-  const totalCreditCardDebt = state.creditCards.reduce((sum, card) => sum + card.currentBalance, 0);
+  const totalExpenses = expenses?.reduce((sum, expense) => sum + expense.amount, 0) ?? 0;
+  const totalInvestments = investments?.reduce((sum, investment) => sum + investment.currentValue, 0) ?? 0;
+  const totalBankAccounts = accounts?.reduce((sum, account) => sum + account.balance, 0) ?? 0;
+  const totalCreditCardDebt = creditCards?.reduce((sum, card) => sum + card.currentBalance, 0) ?? 0;
   const netWorth = totalBankAccounts + totalInvestments - totalCreditCardDebt;
 
   return (
@@ -15,7 +20,7 @@ function App() {
       <header className="bg-gradient-to-r from-primary to-primary-dark text-white shadow-lg">
         <div className="container mx-auto px-4 py-6">
           <h1 className="text-3xl font-bold">Rastreador Financiero</h1>
-          <p className="text-sm opacity-90 mt-1">Hola, {state.user.name}! Aquí está tu resumen financiero.</p>
+          <p className="text-sm opacity-90 mt-1">Hola! Aquí está tu resumen financiero.</p>
         </div>
       </header>
 
@@ -64,6 +69,10 @@ function App() {
               </button>
             </div>
           </div>
+        </div>
+
+        <div className="mt-8">
+          <Expenses />
         </div>
       </main>
 
