@@ -1,13 +1,19 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
-import { UserSettings, Category } from '../types';
+import { UserSettings, Category, BankAccount } from '../types';
 import { db } from '../data/db';
-import { initialUserSettings, defaultCategories as defaultCategoriesBase } from '../data/defaults';
+import { initialUserSettings, defaultCategories as defaultCategoriesBase, defaultAccounts as defaultAccountsBase } from '../data/defaults';
 
 // Add IDs to default categories
 const defaultCategories: Category[] = defaultCategoriesBase.map((cat) => ({
   ...cat,
+  id: uuidv4(),
+}));
+
+// Add IDs to default accounts
+const defaultAccounts: BankAccount[] = defaultAccountsBase.map((acc) => ({
+  ...acc,
   id: uuidv4(),
 }));
 
@@ -212,6 +218,12 @@ export const useSettingsStore = create<SettingsState>()(
           const categories = await db.categories.toArray();
           if (categories.length === 0) {
             await db.categories.bulkAdd(defaultCategories);
+          }
+
+          // Check if bank accounts exist
+          const accounts = await db.accounts.toArray();
+          if (accounts.length === 0) {
+            await db.accounts.bulkAdd(defaultAccounts);
           }
 
           set({

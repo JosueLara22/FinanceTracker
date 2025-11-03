@@ -18,8 +18,11 @@ export {
 
 // Store initialization utility
 export const initializeStores = async () => {
+  // First, initialize defaults (user settings, categories, and default bank accounts)
+  // This will create default data if the database is empty
+  await useSettingsStore.getState().initializeDefaults();
+
   // Load all data from IndexedDB
-  // Note: loadUserSettings() and loadCategories() handle adding defaults if database is empty
   await Promise.all([
     useExpenseStore.getState().loadExpenses(),
     useIncomeStore.getState().loadIncomes(),
@@ -28,9 +31,22 @@ export const initializeStores = async () => {
     useAccountStore.getState().loadCreditCards(),
     useAccountStore.getState().loadBudgets(),
     useAccountStore.getState().loadSavingsGoals(),
-    useSettingsStore.getState().loadUserSettings(),
-    useSettingsStore.getState().loadCategories(),
   ]);
+
+  // After stores are loaded, update investments with daily returns
+  // This runs in the background and doesn't block the UI
+  try {
+    const { investmentUpdateService } = await import('../services/investmentUpdateService');
+
+    // First, backfill historical data for any investments without snapshots
+    await investmentUpdateService.backfillAllInvestments();
+
+    // Then update all investments with any missed days
+    await investmentUpdateService.updateAllInvestments();
+  } catch (error) {
+    console.error('Error updating investments on initialization:', error);
+    // Don't throw - allow app to continue even if investment updates fail
+  }
 };
 
 // Helper to get all store states (useful for debugging)
@@ -54,6 +70,7 @@ export const clearAllStores = async () => {
     db.expenses.clear(),
     db.incomes.clear(),
     db.investments.clear(),
+    db.investmentSnapshots.clear(),
     db.accounts.clear(),
     db.creditCards.clear(),
     db.budgets.clear(),

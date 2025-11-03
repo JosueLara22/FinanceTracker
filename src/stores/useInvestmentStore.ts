@@ -1,8 +1,15 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { v4 as uuidv4 } from 'uuid';
-import { Investment } from '../types';
+import { Investment, InvestmentContribution, InvestmentWithdrawal } from '../types';
 import { db } from '../data/db';
+import {
+  createInvestmentWithAccountDeduction,
+  addContributionWithAccountDeduction,
+  processWithdrawalToAccount,
+  getInvestmentContributions,
+  getInvestmentWithdrawals,
+  getTotalInvested
+} from '../services/investmentTransactions';
 
 interface InvestmentState {
   investments: Investment[];
@@ -11,10 +18,28 @@ interface InvestmentState {
 
   // Actions
   setInvestments: (investments: Investment[]) => void;
-  addInvestment: (investment: Omit<Investment, 'id'>) => Promise<void>;
+  addInvestment: (
+    investment: Omit<Investment, 'id' | 'accumulatedReturns' | 'currentValue' | 'lastUpdate' | 'contributions' | 'withdrawals'>,
+    sourceAccountId?: string
+  ) => Promise<{ success: boolean; error?: string }>;
+  addContribution: (
+    investmentId: string,
+    amount: number,
+    sourceAccountId?: string,
+    source?: string
+  ) => Promise<{ success: boolean; error?: string }>;
+  addWithdrawal: (
+    investmentId: string,
+    amount: number,
+    destinationAccountId?: string,
+    reason?: string
+  ) => Promise<{ success: boolean; error?: string }>;
   updateInvestment: (id: string, updates: Partial<Investment>) => Promise<void>;
   deleteInvestment: (id: string) => Promise<void>;
   getInvestmentById: (id: string) => Investment | undefined;
+  getContributions: (investmentId: string) => Promise<InvestmentContribution[]>;
+  getWithdrawals: (investmentId: string) => Promise<InvestmentWithdrawal[]>;
+  getTotalInvestedAmount: (investmentId: string) => Promise<number>;
   loadInvestments: () => Promise<void>;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -50,28 +75,117 @@ export const useInvestmentStore = create<InvestmentState>()(
         }
       },
 
-      addInvestment: async (investmentData) => {
+      addInvestment: async (investmentData, sourceAccountId) => {
         try {
           set({ isLoading: true, error: null });
 
-          const newInvestment: Investment = {
-            ...investmentData,
-            id: uuidv4(),
-          };
+          const result = await createInvestmentWithAccountDeduction(
+            investmentData,
+            sourceAccountId
+          );
 
-          await db.investments.add(newInvestment);
+          if (!result.success || !result.investment) {
+            set({ error: result.error || 'Failed to add investment', isLoading: false });
+            return { success: false, error: result.error };
+          }
 
           set((state) => ({
-            investments: [...state.investments, newInvestment],
+            investments: [...state.investments, result.investment!],
             isLoading: false,
           }));
+
+          return { success: true };
         } catch (error) {
-          set({
-            error: error instanceof Error ? error.message : 'Failed to add investment',
-            isLoading: false
-          });
-          throw error;
+          const errorMessage = error instanceof Error ? error.message : 'Failed to add investment';
+          set({ error: errorMessage, isLoading: false });
+          return { success: false, error: errorMessage };
         }
+      },
+
+      addContribution: async (investmentId, amount, sourceAccountId, source) => {
+        try {
+          set({ isLoading: true, error: null });
+
+          const result = await addContributionWithAccountDeduction(
+            investmentId,
+            amount,
+            sourceAccountId,
+            source
+          );
+
+          if (!result.success) {
+            set({ error: result.error || 'Failed to add contribution', isLoading: false });
+            return { success: false, error: result.error };
+          }
+
+          // Reload the investment to get updated currentValue
+          const updatedInvestment = await db.investments.get(investmentId);
+          if (updatedInvestment) {
+            set((state) => ({
+              investments: state.investments.map((inv) =>
+                inv.id === investmentId ? updatedInvestment : inv
+              ),
+              isLoading: false,
+            }));
+          } else {
+            set({ isLoading: false });
+          }
+
+          return { success: true };
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to add contribution';
+          set({ error: errorMessage, isLoading: false });
+          return { success: false, error: errorMessage };
+        }
+      },
+
+      addWithdrawal: async (investmentId, amount, destinationAccountId, reason) => {
+        try {
+          set({ isLoading: true, error: null });
+
+          const result = await processWithdrawalToAccount(
+            investmentId,
+            amount,
+            destinationAccountId,
+            reason
+          );
+
+          if (!result.success) {
+            set({ error: result.error || 'Failed to process withdrawal', isLoading: false });
+            return { success: false, error: result.error };
+          }
+
+          // Reload the investment to get updated currentValue
+          const updatedInvestment = await db.investments.get(investmentId);
+          if (updatedInvestment) {
+            set((state) => ({
+              investments: state.investments.map((inv) =>
+                inv.id === investmentId ? updatedInvestment : inv
+              ),
+              isLoading: false,
+            }));
+          } else {
+            set({ isLoading: false });
+          }
+
+          return { success: true };
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to process withdrawal';
+          set({ error: errorMessage, isLoading: false });
+          return { success: false, error: errorMessage };
+        }
+      },
+
+      getContributions: async (investmentId) => {
+        return await getInvestmentContributions(investmentId);
+      },
+
+      getWithdrawals: async (investmentId) => {
+        return await getInvestmentWithdrawals(investmentId);
+      },
+
+      getTotalInvestedAmount: async (investmentId) => {
+        return await getTotalInvested(investmentId);
       },
 
       updateInvestment: async (id, updates) => {

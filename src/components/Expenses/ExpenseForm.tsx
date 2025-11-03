@@ -76,6 +76,19 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
       return;
     }
 
+    // Auto-link cash payments to "Efectivo" account
+    let finalAccountId = accountId;
+    if (paymentMethod === 'cash' && !accountId) {
+      // Find an account named "Efectivo" or "Cash" (case insensitive)
+      const cashAccount = accounts.find(acc =>
+        acc.isActive &&
+        (acc.bank.toLowerCase() === 'efectivo' || acc.bank.toLowerCase() === 'cash')
+      );
+      if (cashAccount) {
+        finalAccountId = cashAccount.id;
+      }
+    }
+
     const now = new Date();
     const timezoneOffset = new Date().getTimezoneOffset() * 60000;
     onAddExpense({
@@ -85,7 +98,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
       subcategory: subcategory || undefined,
       description,
       paymentMethod,
-      accountId: accountId || undefined,
+      accountId: finalAccountId || undefined,
       tags: tags.length > 0 ? tags : undefined,
       recurring,
       createdAt: expense?.createdAt || now,

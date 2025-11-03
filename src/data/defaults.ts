@@ -1,5 +1,5 @@
 
-import { Category, UserSettings } from '../types';
+import { Category, UserSettings, BankAccount } from '../types';
 
 export const initialUserSettings: UserSettings = {
   id: '1',
@@ -11,6 +11,18 @@ export const initialUserSettings: UserSettings = {
   enableBiometricLock: false,
   theme: 'auto',
 };
+
+export const defaultAccounts: Omit<BankAccount, 'id'>[] = [
+  {
+    bank: 'Efectivo',
+    accountType: 'checking',
+    accountNumber: '0000',
+    balance: 0,
+    currency: 'MXN',
+    lastUpdate: new Date(),
+    isActive: true,
+  },
+];
 
 export const defaultCategories: Omit<Category, 'id'>[] = [
   // Expenses
