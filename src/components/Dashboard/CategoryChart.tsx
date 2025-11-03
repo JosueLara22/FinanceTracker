@@ -26,7 +26,7 @@ export const CategoryChart: React.FC<CategoryChartProps> = ({ expenses }) => {
   }, [expenses]);
 
   if (chartData.length === 0) {
-      return <p className='text-center text-gray-500'>No expense data for this period.</p>
+      return <p className='text-center text-gray-500'>No hay datos de gastos para este período.</p>
   }
 
   return (

@@ -14,21 +14,21 @@ export const initialUserSettings: UserSettings = {
 
 export const defaultCategories: Omit<Category, 'id'>[] = [
   // Expenses
-  { name: 'Food', type: 'expense', icon: '🍔' },
-  { name: 'Transportation', type: 'expense', icon: '🚗' },
-  { name: 'Housing', type: 'expense', icon: '🏠' },
-  { name: 'Bills & Utilities', type: 'expense', icon: '💡' },
-  { name: 'Entertainment', type: 'expense', icon: '🎬' },
-  { name: 'Health & Wellness', type: 'expense', icon: '❤️' },
-  { name: 'Shopping', type: 'expense', icon: '🛍️' },
-  { name: 'Education', type: 'expense', icon: '📚' },
-  { name: 'Travel', type: 'expense', icon: '✈️' },
-  { name: 'Other', type: 'expense', icon: '🤷' },
+  { name: 'Comida', type: 'expense', icon: '🍔' },
+  { name: 'Transporte', type: 'expense', icon: '🚗' },
+  { name: 'Vivienda', type: 'expense', icon: '🏠' },
+  { name: 'Facturas y Servicios', type: 'expense', icon: '💡' },
+  { name: 'Entretenimiento', type: 'expense', icon: '🎬' },
+  { name: 'Salud y Bienestar', type: 'expense', icon: '❤️' },
+  { name: 'Compras', type: 'expense', icon: '🛍️' },
+  { name: 'Educación', type: 'expense', icon: '📚' },
+  { name: 'Viajes', type: 'expense', icon: '✈️' },
+  { name: 'Otros', type: 'expense', icon: '🤷' },
 
   // Income
-  { name: 'Salary', type: 'income', icon: '💰' },
+  { name: 'Salario', type: 'income', icon: '💰' },
   { name: 'Freelance', type: 'income', icon: '💼' },
-  { name: 'Investments', type: 'income', icon: '📈' },
-  { name: 'Gifts', type: 'income', icon: '🎁' },
-  { name: 'Other', type: 'income', icon: '🤷' },
+  { name: 'Inversiones', type: 'income', icon: '📈' },
+  { name: 'Regalos', type: 'income', icon: '🎁' },
+  { name: 'Otros', type: 'income', icon: '🤷' },
 ];

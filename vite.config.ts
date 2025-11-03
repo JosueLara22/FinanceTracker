@@ -10,9 +10,9 @@ export default defineConfig({
     registerType: 'autoUpdate',
     includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
     manifest: {
-      name: 'Financial Tracker',
+      name: 'Control Financiero',
       short_name: 'FinTrack',
-      description: 'A personal finance tracking application.',
+      description: 'Una aplicación para el seguimiento de las finanzas personales.',
       theme_color: '#667eea',
       background_color: '#ffffff',
       icons: [

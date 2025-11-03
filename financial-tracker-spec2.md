@@ -340,7 +340,6 @@ interface Category {
   type: 'income' | 'expense' | 'both';
   parentCategoryId?: string;     // For subcategories
   icon?: string;                 // Lucide icon name
-  color?: string;                // Hex color
   isDefault: boolean;            // System default, can't delete
   order: number;                 // Display order
   budgetEnabled: boolean;        // Can this category have a budget?
@@ -1517,7 +1516,7 @@ Each card shows:
 - Manage expense categories
 - Manage income categories
 - Create new categories
-- Edit existing (name, icon, color)
+- Edit existing (name, icon)
 - Reorder categories
 - Delete categories (with reassignment)
 

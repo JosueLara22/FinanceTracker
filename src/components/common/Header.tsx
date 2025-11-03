@@ -16,25 +16,25 @@ export const Header = () => {
   return (
     <header className="bg-gray-50 dark:bg-gray-900 shadow-md">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-primary-DEFAULT dark:text-primary-dark">Financial Tracker</h1>
+        <h1 className="text-2xl font-bold text-primary-DEFAULT dark:text-primary-dark">Control Financiero</h1>
         <nav className="flex space-x-4">
           <NavLink to="/" className={navLinkClasses}>
-            Dashboard
+            Panel
           </NavLink>
           <NavLink to="/expenses" className={navLinkClasses}>
-            Expenses
+            Gastos
           </NavLink>
           <NavLink to="/income" className={navLinkClasses}>
-            Income
+            Ingresos
           </NavLink>
           <NavLink to="/investments" className={navLinkClasses}>
-            Investments
+            Inversiones
           </NavLink>
           <NavLink to="/accounts" className={navLinkClasses}>
-            Accounts
+            Cuentas
           </NavLink>
           <NavLink to="/categories" className={navLinkClasses}>
-            Categories
+            Categorías
           </NavLink>
         </nav>
         <button

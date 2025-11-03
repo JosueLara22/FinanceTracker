@@ -10,7 +10,7 @@ interface CategoryListProps {
 export const CategoryList: React.FC<CategoryListProps> = ({ categories, onEditCategory, onDeleteCategory }) => {
   if (categories.length === 0) {
     return (
-      <p className="text-gray-500 dark:text-gray-400">No categories added yet. Add your first category!</p>
+      <p className="text-gray-500 dark:text-gray-400">Aún no se han agregado categorías. ¡Agrega tu primera categoría!</p>
     );
   }
 
@@ -33,13 +33,13 @@ export const CategoryList: React.FC<CategoryListProps> = ({ categories, onEditCa
               onClick={() => onEditCategory(category.id)}
               className="px-3 py-1 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-600 hover:bg-gray-100 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-DEFAULT"
             >
-              Edit
+              Editar
             </button>
             <button
               onClick={() => onDeleteCategory(category.id)}
               className="px-3 py-1 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-danger hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-danger"
             >
-              Delete
+              Eliminar
             </button>
           </div>
         </div>

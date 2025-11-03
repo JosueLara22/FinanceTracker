@@ -52,7 +52,7 @@ export const ExpenseChart: React.FC<ExpenseChartProps> = ({ expenses }) => {
         <YAxis tickFormatter={formatCurrencyForAxis} tick={{ fontSize: 12 }} />
         <Tooltip formatter={(value: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value)} />
         <Legend />
-        <Line type="monotone" dataKey="amount" name="Total Expenses" stroke="#8884d8" strokeWidth={2} activeDot={{ r: 8 }} />
+        <Line type="monotone" dataKey="amount" name="Gastos Totales" stroke="#8884d8" strokeWidth={2} activeDot={{ r: 8 }} />
       </LineChart>
     </ResponsiveContainer>
   );

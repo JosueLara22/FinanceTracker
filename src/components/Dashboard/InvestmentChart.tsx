@@ -63,7 +63,7 @@ export const InvestmentChart: React.FC<InvestmentChartProps> = ({ investments })
   }, [investments]);
 
   if (investments.length === 0) {
-    return <p className="text-center text-gray-500">No investment data for chart.</p>;
+    return <p className="text-center text-gray-500">No hay datos de inversión para el gráfico.</p>;
   }
 
   const platforms = [...new Set(investments.map(inv => inv.platform))];

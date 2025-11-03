@@ -102,39 +102,39 @@ export const Dashboard: React.FC<DashboardProps> = ({ onAddExpenseClick, onAddIn
     <div className="p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             <DashboardCard 
-                title="Net Worth" 
+                title="Patrimonio Neto"
                 value={formatCurrency(metrics.netWorth)} 
-                description="Total Assets - Total Liabilities"
+                description="Activos Totales - Pasivos Totales"
             />
             <DashboardCard 
-                title="Investment ROI" 
+                title="ROI de Inversión"
                 value={`${metrics.investmentRoi.toFixed(2)}%`} 
-                description="Total Return on Investment"
+                description="Retorno Total de la Inversión"
             />
             <DashboardCard
-                title="Monthly Expenses"
+                title="Gastos Mensuales"
                 value={formatCurrency(metrics.monthlyExpenses)}
-                description="Expenses this month"
+                description="Gastos de este mes"
             />
             <DashboardCard
-                title="Monthly Cash Flow"
+                title="Flujo de Caja Mensual"
                 value={formatCurrency(metrics.monthlyCashFlow)}
-                description="Income - Expenses this month"
+                description="Ingresos - Gastos de este mes"
             />
         </div>
 
         <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-2">Quick Actions</h3>
+            <h3 className="text-lg font-semibold mb-2">Acciones Rápidas</h3>
             <div className="flex space-x-4">
 
                 <button onClick={onAddExpenseClick} className="bg-primary-dark text-white px-4 py-2 rounded-lg shadow hover:bg-primary-DEFAULT dark:bg-primary-DEFAULT dark:hover:bg-primary-light transition-colors">
-                    Add Expense
+                    Agregar Gasto
                 </button>
                 <button onClick={onAddIncomeClick} className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 transition-colors">
-                    Add Income
+                    Agregar Ingreso
                 </button>
                 <button className="bg-gray-300 text-gray-500 px-4 py-2 rounded-lg shadow cursor-not-allowed" disabled>
-                    Update Investment Returns
+                    Actualizar Retornos de Inversión
                 </button>
             </div>
         </div>

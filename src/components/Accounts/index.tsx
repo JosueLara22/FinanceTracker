@@ -31,11 +31,11 @@ export const Accounts: React.FC = () => {
   };
 
   const handleDeleteAccount = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this account? This action cannot be undone.')) {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta cuenta? Esta acción no se puede deshacer.')) {
       try {
         await deleteAccount(id);
       } catch (error) {
-        alert('Failed to delete account. Please try again.');
+        alert('No se pudo eliminar la cuenta. Por favor, inténtalo de nuevo.');
       }
     }
   };
@@ -57,11 +57,11 @@ export const Accounts: React.FC = () => {
   };
 
   const handleDeleteCreditCard = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this credit card? This action cannot be undone.')) {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta tarjeta de crédito? Esta acción no se puede deshacer.')) {
       try {
         await deleteCreditCard(id);
       } catch (error) {
-        alert('Failed to delete credit card. Please try again.');
+        alert('No se pudo eliminar la tarjeta de crédito. Por favor, inténtalo de nuevo.');
       }
     }
   };
@@ -72,23 +72,23 @@ export const Accounts: React.FC = () => {
   };
 
   const tabs = [
-    { id: 'overview' as TabType, name: 'Overview', icon: LayoutDashboard },
-    { id: 'accounts' as TabType, name: 'Bank Accounts', icon: Wallet },
-    { id: 'cards' as TabType, name: 'Credit Cards', icon: CreditCardIcon },
+    { id: 'overview' as TabType, name: 'Resumen', icon: LayoutDashboard },
+    { id: 'accounts' as TabType, name: 'Cuentas Bancarias', icon: Wallet },
+    { id: 'cards' as TabType, name: 'Tarjetas de Crédito', icon: CreditCardIcon },
   ];
 
   return (
     <div className="p-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Financial Accounts</h2>
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Cuentas Financieras</h2>
 
         {activeTab === 'accounts' && (
           <button
             onClick={handleAddAccount}
             className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-DEFAULT hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-DEFAULT"
           >
-            Add Bank Account
+            Agregar Cuenta Bancaria
           </button>
         )}
 
@@ -97,7 +97,7 @@ export const Accounts: React.FC = () => {
             onClick={handleAddCreditCard}
             className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-DEFAULT hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-DEFAULT"
           >
-            Add Credit Card
+            Agregar Tarjeta de Crédito
           </button>
         )}
       </div>
@@ -157,7 +157,7 @@ export const Accounts: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              {accountToEdit ? 'Edit Bank Account' : 'Add New Bank Account'}
+              {accountToEdit ? 'Editar Cuenta Bancaria' : 'Agregar Nueva Cuenta Bancaria'}
             </h3>
             <AccountForm
               onClose={handleCloseAccountForm}
@@ -172,7 +172,7 @@ export const Accounts: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              {cardToEdit ? 'Edit Credit Card' : 'Add New Credit Card'}
+              {cardToEdit ? 'Editar Tarjeta de Crédito' : 'Agregar Nueva Tarjeta de Crédito'}
             </h3>
             <CreditCardForm
               onClose={handleCloseCreditCardForm}
