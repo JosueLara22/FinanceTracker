@@ -37,11 +37,47 @@ export interface Investment {
   initialCapital: number;
   startDate: Date;
   gatPercentage: number; // Annual GAT%
-  dailyReturn: number; // Calculated
+  dailyReturn: number; // Calculated daily (will be computed dynamically)
   accumulatedReturns: number;
   currentValue: number;
   lastUpdate: Date;
   autoReinvest: boolean;
+  sourceAccountId?: string; // NEW - FK to BankAccount.id (where initial capital came from)
+  contributions?: InvestmentContribution[]; // List of additional contributions
+  withdrawals?: InvestmentWithdrawal[]; // List of withdrawals
+}
+
+// Investment Contribution (adding money to investment)
+export interface InvestmentContribution {
+  id: string;
+  investmentId: string;
+  date: Date;
+  amount: number;
+  source?: string; // Optional text description
+  sourceAccountId?: string; // NEW - FK to BankAccount.id (where contribution came from)
+  createdAt: Date;
+}
+
+// Investment Withdrawal (taking money out of investment)
+export interface InvestmentWithdrawal {
+  id: string;
+  investmentId: string;
+  date: Date;
+  amount: number;
+  reason?: string; // Optional text description
+  destinationAccountId?: string; // FK to BankAccount.id (where money goes)
+  createdAt: Date;
+}
+
+// Snapshot of investment value at a specific point in time
+export interface InvestmentSnapshot {
+  id: string;
+  investmentId: string;
+  date: Date;
+  value: number; // Total value at this date
+  accumulatedReturns: number; // Total returns up to this date
+  dailyReturn: number; // Return earned on this specific day
+  createdAt: Date;
 }
 
 export interface BankAccount {

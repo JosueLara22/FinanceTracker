@@ -3,6 +3,9 @@ import {
   Expense,
   Income,
   Investment,
+  InvestmentSnapshot,
+  InvestmentContribution,
+  InvestmentWithdrawal,
   BankAccount,
   CreditCard,
   Transaction,
@@ -17,6 +20,9 @@ export class FinancialDatabase extends Dexie {
   expenses!: Table<Expense, string>;
   incomes!: Table<Income, string>;
   investments!: Table<Investment, string>;
+  investmentSnapshots!: Table<InvestmentSnapshot, string>;
+  investmentContributions!: Table<InvestmentContribution, string>;
+  investmentWithdrawals!: Table<InvestmentWithdrawal, string>;
   accounts!: Table<BankAccount, string>;
   creditCards!: Table<CreditCard, string>;
   transactions!: Table<Transaction, string>;
@@ -32,6 +38,40 @@ export class FinancialDatabase extends Dexie {
       expenses: 'id, date, category, paymentMethod, accountId',
       incomes: 'id, date, category, source, accountId',
       investments: 'id, platform, type',
+      accounts: 'id, bank, accountType',
+      creditCards: 'id, bank, cardName',
+      transactions: 'id, accountId, date, type, transferId, expenseId, incomeId',
+      transfers: 'id, fromAccountId, toAccountId, date, status',
+      budgets: 'id, category, period',
+      savingsGoals: 'id, name, priority',
+      categories: 'id, name, type',
+      userSettings: 'id',
+    });
+
+    // Version 2: Add investment snapshots
+    this.version(2).stores({
+      expenses: 'id, date, category, paymentMethod, accountId',
+      incomes: 'id, date, category, source, accountId',
+      investments: 'id, platform, type',
+      investmentSnapshots: 'id, investmentId, date, [investmentId+date]',
+      accounts: 'id, bank, accountType',
+      creditCards: 'id, bank, cardName',
+      transactions: 'id, accountId, date, type, transferId, expenseId, incomeId',
+      transfers: 'id, fromAccountId, toAccountId, date, status',
+      budgets: 'id, category, period',
+      savingsGoals: 'id, name, priority',
+      categories: 'id, name, type',
+      userSettings: 'id',
+    });
+
+    // Version 3: Add sourceAccountId to investments, add contributions and withdrawals tables
+    this.version(3).stores({
+      expenses: 'id, date, category, paymentMethod, accountId',
+      incomes: 'id, date, category, source, accountId',
+      investments: 'id, platform, type, sourceAccountId', // Added sourceAccountId index
+      investmentSnapshots: 'id, investmentId, date, [investmentId+date]',
+      investmentContributions: 'id, investmentId, date, sourceAccountId', // NEW table
+      investmentWithdrawals: 'id, investmentId, date, destinationAccountId', // NEW table
       accounts: 'id, bank, accountType',
       creditCards: 'id, bank, cardName',
       transactions: 'id, accountId, date, type, transferId, expenseId, incomeId',

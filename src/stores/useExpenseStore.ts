@@ -60,7 +60,7 @@ export const useExpenseStore = create<ExpenseState>()(
           await db.expenses.add(newExpense);
 
           // Create transaction if account is linked
-          if (newExpense.accountId && (newExpense.paymentMethod === 'debit' || newExpense.paymentMethod === 'credit' || newExpense.paymentMethod === 'transfer')) {
+          if (newExpense.accountId && (newExpense.paymentMethod === 'debit' || newExpense.paymentMethod === 'credit' || newExpense.paymentMethod === 'transfer' || newExpense.paymentMethod === 'cash')) {
             const transactionStore = useTransactionStore.getState();
             const accountStore = useAccountStore.getState();
 

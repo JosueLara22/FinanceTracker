@@ -28,6 +28,8 @@ financial-tracker/
 │   │   ├── Expenses/
 │   │   ├── Income/
 │   │   ├── Investments/
+│   │   │   ├── InvestmentComparison.tsx
+│   │   │   └── InvestmentMigrationPrompt.tsx
 │   │   ├── Budget/
 │   │   ├── Accounts/
 │   │   ├── Bills/
@@ -42,14 +44,17 @@ financial-tracker/
 │   │   ├── calculations.ts
 │   │   ├── validation.ts
 │   │   ├── formatters.ts
-│   │   └── currency.ts
+│   │   ├── currency.ts
+│   │   ├── investmentCalculations.ts
+│   │   └── investmentMigration.ts
 │   ├── types/             # TypeScript definitions
 │   ├── data/              # Default data and constants
 │   ├── services/          # Business logic layer
 │   │   ├── storage.ts     # IndexedDB/LocalStorage abstraction
 │   │   ├── export.ts      # Export functionality
 │   │   ├── import.ts      # Import functionality
-│   │   └── calculations.ts
+│   │   ├── investmentTransactions.ts
+│   │   └── investmentUpdateService.ts
 │   ├── db/                # Database schema
 │   │   └── schema.ts      # Dexie.js configuration
 │   ├── routes/            # Route definitions
@@ -126,16 +131,17 @@ interface Investment {
   platformName?: string;         // If Other
   type: string;                  // 'Cajita', 'Inversión', 'Fondo', etc.
   initialCapital: number;
+  sourceAccountId?: string;      // NEW: FK to BankAccount.id for tracking fund source
   startDate: Date;
   gatPercentage: number;         // Annual GAT%
-  dailyReturn: number;           // Calculated automatically
-  accumulatedReturns: number;    // Sum of all returns
+  dailyReturn: number;           // DEPRECATED: To be calculated dynamically
+  accumulatedReturns: number;    // Sum of all returns, updated daily
   currentValue: number;          // Initial + contributions + returns - withdrawals
-  lastUpdate: Date;
+  lastUpdate: Date;              // Last time the automatic calculation ran
   autoReinvest: boolean;
-  contributions: InvestmentContribution[];
-  withdrawals: InvestmentWithdrawal[];
-  valueHistory: InvestmentSnapshot[];
+  contributions: InvestmentContribution[]; // Embedded for simplicity, but stored in own table
+  withdrawals: InvestmentWithdrawal[];     // Embedded for simplicity, but stored in own table
+  valueHistory: InvestmentSnapshot[];      // Embedded for simplicity, but stored in own table
   taxableReturns: number;        // For ISR calculation
   isActive: boolean;
   createdAt: Date;
@@ -148,7 +154,8 @@ interface InvestmentContribution {
   investmentId: string;
   date: Date;
   amount: number;
-  source?: string;               // Where money came from
+  source?: string;               // Optional description
+  sourceAccountId?: string;      // NEW: FK to BankAccount.id for tracking fund source
   createdAt: Date;
 }
 
@@ -159,16 +166,19 @@ interface InvestmentWithdrawal {
   date: Date;
   amount: number;
   reason?: string;
-  destinationAccountId?: string;
+  destinationAccountId?: string; // FK to BankAccount.id
   createdAt: Date;
 }
 
-// 3c. Investment Snapshot (for historical tracking)
+// 3c. Investment Snapshot (for historical tracking) - UPDATED
 interface InvestmentSnapshot {
+  id: string;
+  investmentId: string;
   date: Date;
   value: number;
-  returns: number;               // Returns for that period
-  gatPercentage: number;         // GAT at that time
+  accumulatedReturns: number;
+  dailyReturn: number;
+  createdAt: Date;
 }
 
 // 4. BankAccount
@@ -555,6 +565,9 @@ class FinanceTrackerDB extends Dexie {
   expenses!: Table<Expense>;
   incomes!: Table<Income>;
   investments!: Table<Investment>;
+  investmentContributions!: Table<InvestmentContribution>; // NEW
+  investmentWithdrawals!: Table<InvestmentWithdrawal>; // NEW
+  investmentSnapshots!: Table<InvestmentSnapshot>;     // NEW
   accounts!: Table<BankAccount>;
   creditCards!: Table<CreditCard>;
   loans!: Table<Loan>;
@@ -572,10 +585,10 @@ class FinanceTrackerDB extends Dexie {
   constructor() {
     super('FinanceTrackerDB');
 
-    this.version(1).stores({
+    this.version(3).stores({
       expenses: 'id, date, category, accountId, *tags, recurring, sharedExpenseId',
       incomes: 'id, date, category, source, accountId, recurring, taxable',
-      investments: 'id, platform, startDate, isActive',
+      investments: 'id, platform, startDate, isActive, sourceAccountId',
       accounts: 'id, bank, accountType, currency, isActive',
       creditCards: 'id, bank, isActive',
       loans: 'id, lender, type, isActive',
@@ -588,7 +601,11 @@ class FinanceTrackerDB extends Dexie {
       categories: 'id, type, parentCategoryId, isDefault',
       sharedExpenses: 'id, expenseId, settled',
       taxCategories: 'id, type',
-      settings: 'id'
+      settings: 'id',
+      // New tables for Investment feature enhancements
+      investmentContributions: 'id, investmentId, date, sourceAccountId',
+      investmentWithdrawals: 'id, investmentId, date, destinationAccountId',
+      investmentSnapshots: 'id, &[investmentId+date], investmentId, date',
     });
   }
 }
@@ -1126,7 +1143,6 @@ function calculateISR(income: number): number {
   - Add Expense (with quick amount keypad)
   - Add Income
   - Quick Transfer
-  - Update Investment Returns
   - Pay Bill
 
 **Recent Activity:**
@@ -1222,58 +1238,53 @@ function calculateISR(income: number): number {
 - Year-over-year comparison
 - Taxable vs non-taxable breakdown
 
-### 4. Investment Manager (Mexican Fintech Focus)
+### 4. Investment Manager (Mexican Fintech Focus) - UPDATED
+
+**Migration Prompt:**
+- On first load of the investment section, if any existing investments are not linked to a source account, a modal (`InvestmentMigrationPrompt`) will appear.
+- This prompt allows the user to link each legacy investment to an existing bank account.
+- Users can skip this process, but the prompt may reappear in a future session.
 
 **Dashboard:**
 - Platform comparison cards (Nu, Didi, MercadoPago):
   - Current balance (large)
   - GAT percentage (prominent with color coding)
-  - Daily returns (calculated, auto-updating)
+  - Daily returns (calculated automatically, no manual button)
   - Total returns accumulated
   - ROI percentage
-  - Days invested
-  - Projected annual return
-  - Quick actions: Add funds, Withdraw, View details
+  - Last update timestamp.
+- Quick actions: Add Investment, Add Contribution, Withdraw, View details.
 
-**Comparison Matrix:**
-| Platform | Balance | GAT % | Daily Return | Monthly Return | Annual Projection | ROI % |
-|----------|---------|-------|--------------|----------------|-------------------|-------|
-| Nu       | $10,000 | 15.2% | $4.16       | $125           | $1,520            | 15.2% |
-| Didi     | $5,000  | 13.8% | $1.89       | $57            | $690              | 13.8% |
-| MercadoPago | $8,000 | 14.5% | $3.18    | $95            | $1,160            | 14.5% |
+**Platform Comparison View (`/investments/compare`):**
+- A dedicated dashboard for comparing investment platforms.
+- **Metrics to Display:**
+  - Platform-wise total invested capital
+  - Platform-wise current value
+  - Platform-wise ROI %
+  - Average GAT % by platform
+  - Total returns by platform
+  - Performance ranking
+- A sortable table showing these metrics for detailed comparison.
 
 **Investment Detail View:**
-- Value chart over time
-- Contributions list (chronological)
-- Withdrawals list
-- Returns breakdown (daily snapshots)
-- Performance metrics:
-  - Total invested
+- Value chart over time using historical `InvestmentSnapshot` data.
+- Lists of contributions and withdrawals, showing which accounts were used.
+- Detailed performance metrics:
+  - Total invested (initial capital + all contributions)
   - Current value
-  - Total returns
+  - Total returns (gain/loss)
   - ROI percentage
-  - Average daily return
-  - Best performing day
   - Annualized return
-- Investment calculator:
-  - "What if" scenarios
-  - Compound interest projections
-  - Goal-based calculations
+- Investment calculator for projections ("What if" scenarios).
 
-**Add/Withdraw Funds:**
-- Amount input
-- Date selector
-- Source/Destination account
-- Notes
-- Auto-recalculate returns
+**Add Investment / Contribution Form:**
+- **Source Account Selector**: A new mandatory dropdown to select the bank account from which to deduct the funds.
+- The form will validate that the selected account has sufficient funds before allowing the transaction.
+- Upon submission, a `Transaction` record is created for the source account, ensuring the net worth remains accurate.
 
-**Platform Recommendation Engine:**
-- Based on:
-  - Amount to invest
-  - Investment term
-  - Current rates
-  - Platform reliability scores
-- Shows best option with reasoning
+**Withdraw Funds Form:**
+- **Destination Account Selector**: A dropdown to select the bank account where the withdrawn funds will be deposited.
+- Upon submission, a `Transaction` record is created for the destination account.
 
 ### 5. Budget Planner
 
