@@ -10,6 +10,8 @@ import { IncomeForm } from './components/Income/IncomeForm';
 import { AccountDetail } from './components/Accounts/AccountDetail';
 import { Header } from './components/common/Header';
 import { Categories } from './components/Categories';
+import { Transfers } from './components/Transfers';
+import { DataBackup } from './components/DataBackup';
 import {
   initializeStores,
   useExpenseStore,
@@ -58,7 +60,7 @@ function App() {
   }
 
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL}>
       <main className={`bg-gray-50 dark:bg-gray-900 min-h-screen`}>
         <Header />
         <div className="container mx-auto p-4">
@@ -68,6 +70,7 @@ function App() {
             <Route path="/investments" element={<Investments />} />
             <Route path="/accounts" element={<Accounts />} />
             <Route path="/income" element={<Income />} />
+            <Route path="/transfers" element={<Transfers />} />
             <Route path="/categories" element={<Categories />} />
             <Route path="/accounts/bank/:id" element={<AccountDetail type="bank" />} />
             <Route path="/accounts/credit/:id" element={<AccountDetail type="credit" />} />
@@ -103,6 +106,9 @@ function App() {
             </div>
           </div>
         )}
+
+        {/* Data Backup Utility */}
+        <DataBackup />
       </main>
     </Router>
   );
