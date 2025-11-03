@@ -45,7 +45,10 @@ export const useTransactionStore = create<TransactionState>()(
       loadTransactions: async () => {
         try {
           set({ isLoading: true, error: null });
-          const transactions = await db.transactions.toArray();
+          // Filter out soft-deleted transactions
+          const transactions = await db.transactions
+            .filter(t => !t.deletedAt)
+            .toArray();
           set({ transactions, isLoading: false });
         } catch (error) {
           set({
@@ -109,6 +112,9 @@ export const useTransactionStore = create<TransactionState>()(
 
           if (transaction) {
             await get().recalculateAccountBalance(transaction.accountId);
+            if (updates.accountId && updates.accountId !== transaction.accountId) {
+              await get().recalculateAccountBalance(updates.accountId);
+            }
           }
         } catch (error) {
           set({
@@ -170,7 +176,7 @@ export const useTransactionStore = create<TransactionState>()(
       },
 
       // Calculate balance after a transaction for an account
-      calculateBalanceAfterTransaction: (accountId, amount) => {
+      calculateBalanceAfterTransaction: (accountId: string, amount: number) => {
         const accountTransactions = get()
           .transactions
           .filter((t) => t.accountId === accountId)
@@ -198,8 +204,9 @@ export const useTransactionStore = create<TransactionState>()(
         } else {
           const creditCard = accountStore.getCreditCardById(accountId);
           if (creditCard) {
-            const newAvailable = creditCard.creditLimit - newBalance;
-            await accountStore.updateCreditCard(accountId, { currentBalance: newBalance, availableCredit: newAvailable });
+            const newCurrentBalance = -newBalance;
+            const newAvailable = creditCard.creditLimit - newCurrentBalance;
+            await accountStore.updateCreditCard(accountId, { currentBalance: newCurrentBalance, availableCredit: newAvailable });
           }
         }
       },

@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useTransferStore } from '../../stores/useTransferStore';
 import { useAccountStore } from '../../stores/useAccountStore';
+import { CreditCard } from '../../types';
 import { ArrowRight, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface TransferFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
+  initialToCreditCard?: CreditCard;
 }
 
-export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel }) => {
+export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel, initialToCreditCard }) => {
   const { createTransfer, validateTransfer, isLoading, error: storeError } = useTransferStore();
   const { accounts, creditCards, loadAccounts, loadCreditCards } = useAccountStore();
 
@@ -28,19 +30,27 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel 
     loadCreditCards();
   }, [loadAccounts, loadCreditCards]);
 
+  useEffect(() => {
+    if (initialToCreditCard) {
+      setToAccountId(initialToCreditCard.id);
+      setToAccountType('credit');
+      setDescription(`Payment for ${initialToCreditCard.bank} ${initialToCreditCard.cardName}`);
+    }
+  }, [initialToCreditCard]);
+
   const getSourceAccountOptions = () => {
     const bankOptions = accounts
       .filter(a => a.isActive)
       .map(a => ({
         value: a.id,
-        label: `${a.bank} ****${a.accountNumber} (${formatCurrency(a.balance)})`,
+        label: `${a.name} (${formatCurrency(a.balance)})`,
         type: 'bank' as const,
         balance: a.balance,
       }));
 
     const creditOptions = creditCards.map(c => ({
       value: c.id,
-      label: `${c.bank} ${c.cardName} (Available: ${formatCurrency(c.availableCredit)})`,
+      label: `${c.cardName} (Available: ${formatCurrency(c.availableCredit)})`,
       type: 'credit' as const,
       balance: c.availableCredit,
     }));
@@ -53,7 +63,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel 
       .filter(a => a.isActive && a.id !== fromAccountId)
       .map(a => ({
         value: a.id,
-        label: `${a.bank} ****${a.accountNumber}`,
+        label: a.name,
         type: 'bank' as const,
       }));
 
@@ -61,7 +71,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel 
       .filter(c => c.id !== fromAccountId)
       .map(c => ({
         value: c.id,
-        label: `${c.bank} ${c.cardName} (Pay Balance)`,
+        label: `${c.cardName} (Pay Balance)`,
         type: 'credit' as const,
       }));
 
@@ -185,35 +195,35 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">New Transfer</h2>
+    <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">New Transfer</h2>
 
       {/* Error Message */}
       {(error || storeError) && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
-          <AlertCircle className="w-5 h-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-800">{error || storeError}</p>
+        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start">
+          <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 mr-2 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-red-800 dark:text-red-200">{error || storeError}</p>
         </div>
       )}
 
       {/* Success Message */}
       {success && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start">
-          <CheckCircle className="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-green-800">Transfer created successfully!</p>
+        <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-start">
+          <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-2 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-green-800 dark:text-green-200">Transfer created successfully!</p>
         </div>
       )}
 
       <div className="space-y-6">
         {/* From Account */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             From Account
           </label>
           <select
             value={fromAccountId}
             onChange={(e) => handleSourceChange(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           >
             <option value="">Select source account</option>
@@ -227,18 +237,18 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel 
 
         {/* Arrow Indicator */}
         <div className="flex justify-center">
-          <ArrowRight className="w-8 h-8 text-gray-400" />
+          <ArrowRight className="w-8 h-8 text-gray-400 dark:text-gray-500" />
         </div>
 
         {/* To Account */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             To Account
           </label>
           <select
             value={toAccountId}
             onChange={(e) => handleDestinationChange(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
             disabled={!fromAccountId}
           >
@@ -253,11 +263,11 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel 
 
         {/* Amount */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Amount
           </label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">
               $
             </span>
             <input
@@ -266,7 +276,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel 
               onChange={(e) => handleAmountChange(e.target.value)}
               step="0.01"
               min="0.01"
-              className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-8 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 dark:placeholder-gray-500"
               placeholder="0.00"
               required
             />
@@ -275,11 +285,11 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel 
 
         {/* Fee (Optional) */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Transfer Fee (Optional)
           </label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">
               $
             </span>
             <input
@@ -288,7 +298,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel 
               onChange={(e) => setFee(e.target.value)}
               step="0.01"
               min="0"
-              className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-8 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 dark:placeholder-gray-500"
               placeholder="0.00"
             />
           </div>
@@ -296,14 +306,14 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel 
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Description
           </label>
           <input
             type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 dark:placeholder-gray-500"
             placeholder="e.g., Credit card payment, Savings transfer"
             required
           />
@@ -311,7 +321,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel 
 
         {/* Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Date
           </label>
           <input
@@ -319,21 +329,21 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel 
             value={date}
             onChange={(e) => setDate(e.target.value)}
             max={new Date().toISOString().split('T')[0]}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
         </div>
 
         {/* Transfer Summary */}
         {fromAccountId && toAccountId && amount && parseFloat(amount) > 0 && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-blue-900 mb-2">Transfer Summary</h3>
-            <div className="space-y-1 text-sm text-blue-800">
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">Transfer Summary</h3>
+            <div className="space-y-1 text-sm text-blue-800 dark:text-blue-200">
               <p>Amount to transfer: <span className="font-semibold">{formatCurrency(parseFloat(amount))}</span></p>
               {fee && parseFloat(fee) > 0 && (
                 <p>Transfer fee: <span className="font-semibold">{formatCurrency(parseFloat(fee))}</span></p>
               )}
-              <p className="pt-2 border-t border-blue-300">
+              <p className="pt-2 border-t border-blue-300 dark:border-blue-700">
                 Total: <span className="font-semibold">{formatCurrency(parseFloat(amount) + (fee ? parseFloat(fee) : 0))}</span>
               </p>
             </div>
@@ -346,7 +356,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel 
             <button
               type="button"
               onClick={onCancel}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               disabled={isLoading}
             >
               Cancel

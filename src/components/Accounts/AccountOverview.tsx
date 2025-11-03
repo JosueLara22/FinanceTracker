@@ -1,9 +1,36 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { useAccountStore } from '../../stores';
-import { Wallet, CreditCard as CreditCardIcon, TrendingUp, TrendingDown, DollarSign, AlertCircle } from 'lucide-react';
+import { runManualReconciliation } from '../../stores';
+import { Wallet, CreditCard as CreditCardIcon, TrendingUp, TrendingDown, DollarSign, AlertCircle, RefreshCw, Info } from 'lucide-react';
 
 export const AccountOverview: React.FC = () => {
   const { accounts, creditCards, calculateNetWorth, calculateTotalCreditUtilization } = useAccountStore();
+  const [isReconciling, setIsReconciling] = useState(false);
+  const [reconcileMessage, setReconcileMessage] = useState<string | null>(null);
+
+  const handleReconcile = useCallback(async () => {
+    setIsReconciling(true);
+    setReconcileMessage(null);
+
+    try {
+      console.log('[AccountOverview] Starting manual reconciliation...');
+      const report = await runManualReconciliation();
+
+      // Show success message with details
+      const message = `✅ Reconciliation complete! Fixed ${report.reconciliation.balancesFixed} accounts, cleaned up ${report.orphanedCleaned} orphaned transactions.`;
+      setReconcileMessage(message);
+      console.log('[AccountOverview] Reconciliation successful:', report);
+
+      // Clear message after 5 seconds
+      setTimeout(() => setReconcileMessage(null), 5000);
+    } catch (error) {
+      console.error('[AccountOverview] Reconciliation failed:', error);
+      setReconcileMessage('❌ Reconciliation failed. Please check the console for details.');
+      setTimeout(() => setReconcileMessage(null), 5000);
+    } finally {
+      setIsReconciling(false);
+    }
+  }, []);
 
   // Calculate summary statistics
   const totalBankBalance = accounts
@@ -19,7 +46,7 @@ export const AccountOverview: React.FC = () => {
   // Get active accounts by type
   const checkingAccounts = accounts.filter(acc => acc.accountType === 'checking' && acc.isActive);
   const savingsAccounts = accounts.filter(acc => acc.accountType === 'savings' && acc.isActive);
-  const investmentAccounts = accounts.filter(acc => acc.accountType === 'investment' && acc.isActive);
+  const investmentAccounts = accounts.filter(acc => acc.type === 'bank' && !acc.accountType && acc.isActive);
 
   const checkingTotal = checkingAccounts.reduce((sum, acc) => sum + acc.balance, 0);
   const savingsTotal = savingsAccounts.reduce((sum, acc) => sum + acc.balance, 0);
@@ -39,6 +66,47 @@ export const AccountOverview: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Reconciliation Section */}
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-1">
+              Data Integrity & Balance Reconciliation
+            </h3>
+            <p className="text-xs text-blue-700 dark:text-blue-400 mb-3">
+              If you notice incorrect balances or inconsistencies, click below to automatically fix discrepancies,
+              recalculate all account balances from transactions, and clean up orphaned data.
+            </p>
+
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleReconcile}
+                disabled={isReconciling}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors text-sm ${
+                  isReconciling
+                    ? 'bg-gray-400 cursor-not-allowed text-white'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'
+                }`}
+              >
+                <RefreshCw className={`h-4 w-4 ${isReconciling ? 'animate-spin' : ''}`} />
+                {isReconciling ? 'Reconciling...' : 'Fix Balance Issues'}
+              </button>
+
+              {reconcileMessage && (
+                <div className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
+                  reconcileMessage.startsWith('✅')
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                }`}>
+                  {reconcileMessage}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Net Worth */}
@@ -151,7 +219,7 @@ export const AccountOverview: React.FC = () => {
             <div className="mt-4 space-y-2">
               {checkingAccounts.map(acc => (
                 <div key={acc.id} className="text-xs text-gray-600 dark:text-gray-400 flex justify-between">
-                  <span>{acc.bank}</span>
+                  <span>{acc.bankName || acc.name}</span>
                   <span className="font-medium">
                     ${acc.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
@@ -177,7 +245,7 @@ export const AccountOverview: React.FC = () => {
             <div className="mt-4 space-y-2">
               {savingsAccounts.map(acc => (
                 <div key={acc.id} className="text-xs text-gray-600 dark:text-gray-400 flex justify-between">
-                  <span>{acc.bank}</span>
+                  <span>{acc.bankName || acc.name}</span>
                   <span className="font-medium">
                     ${acc.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
@@ -203,7 +271,7 @@ export const AccountOverview: React.FC = () => {
             <div className="mt-4 space-y-2">
               {investmentAccounts.map(acc => (
                 <div key={acc.id} className="text-xs text-gray-600 dark:text-gray-400 flex justify-between">
-                  <span>{acc.bank}</span>
+                  <span>{acc.bankName || acc.name}</span>
                   <span className="font-medium">
                     ${acc.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>

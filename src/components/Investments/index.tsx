@@ -16,7 +16,7 @@ export const Investments: React.FC = () => {
       {/* Migration prompt for existing investments */}
       <InvestmentMigrationPrompt />
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold dark:text-gray-300">Investments</h1>
+        <h1 className="text-2xl font-bold">Inversiones</h1>
         <button
           onClick={() => setIsFormVisible(!isFormVisible)}
           className="bg-primary-DEFAULT text-white px-4 py-2 rounded-md shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-DEFAULT"
@@ -50,7 +50,7 @@ export const Investments: React.FC = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
             }`}
           >
-            All Investments ({investments.length})
+            Todas las Inversiones ({investments.length})
           </button>
           <button
             onClick={() => setActiveTab('comparison')}
@@ -60,7 +60,7 @@ export const Investments: React.FC = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
             }`}
           >
-            Platform Comparison
+            Comparación de Plataformas
           </button>
         </nav>
       </div>

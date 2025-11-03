@@ -24,8 +24,6 @@ export const AccountDetail: React.FC<AccountDetailProps> = ({ type }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const {
-    accounts,
-    creditCards,
     getAccountById,
     getCreditCardById,
     deleteAccount,
@@ -127,7 +125,7 @@ export const AccountDetail: React.FC<AccountDetailProps> = ({ type }) => {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
               {type === 'bank'
-                ? `${account!.bank} Account`
+                ? `${account!.bankName || account!.name} Account`
                 : `${creditCard!.bank} ${creditCard!.cardName}`}
             </h1>
             <p className="text-gray-600 mt-1">

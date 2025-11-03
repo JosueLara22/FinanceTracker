@@ -8,10 +8,10 @@ export interface Income {
   description: string;
   source: string; // e.g., Employer, Client, Bank
   recurring?: boolean;
-  accountId?: string; // FK to BankAccount (where deposited)
-  attachments?: string[]; // e.g., pay stubs
-  createdAt: Date;
-  updatedAt: Date;
+  accountId?: string; // FK to Account (where deposited)
+  createdAt?: Date;
+  updatedAt?: Date;
+  deletedAt?: Date;
 }
 
 export interface Expense {
@@ -22,12 +22,13 @@ export interface Expense {
   subcategory?: string;
   description: string;
   paymentMethod: 'cash' | 'debit' | 'credit' | 'transfer' | 'other';
-  accountId?: string; // FK to BankAccount or CreditCard
+  accountId?: string; // FK to Account or CreditCard
   tags?: string[];
   recurring?: boolean;
   attachments?: string[]; // base64 images of receipts
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
 }
 
 export interface Investment {
@@ -80,16 +81,30 @@ export interface InvestmentSnapshot {
   createdAt: Date;
 }
 
-export interface BankAccount {
+export interface Account {
   id: string;
-  bank: string;
-  accountType: 'checking' | 'savings' | 'investment' | 'credit card';
-  accountNumber: string; // Last 4 digits only
+  name: string; // e.g., "My Wallet", "BBVA Debit"
+  type: 'bank' | 'cash'; // The new discriminator
   balance: number;
   currency: 'MXN' | 'USD';
-  lastUpdate: Date;
   isActive: boolean;
+  lastUpdate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+
+  // Bank-specific fields (optional)
+  bankName?: string;
+  accountNumber?: string; // Last 4 digits
+  accountType?: 'checking' | 'savings'; // Traditional account types
+
+  // Robustness fields
+  needsRecalculation?: boolean;
+  hasDiscrepancy?: boolean;
+  deletedAt?: Date;
 }
+
+// BankAccount is an alias for Account (for backward compatibility)
+export type BankAccount = Account;
 
 export interface CreditCard {
   id: string;
@@ -102,6 +117,14 @@ export interface CreditCard {
   cutoffDate: number; // Day of month
   paymentDate: number; // Day of month
   interestRate: number;
+  lastUpdate?: Date;
+
+  // Robustness fields
+  needsRecalculation?: boolean;
+  hasDiscrepancy?: boolean;
+  deletedAt?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 // Transaction (for accounts and cards)
@@ -111,7 +134,7 @@ export interface Transaction {
   accountType: 'bank' | 'credit';
   date: Date;
   amount: number; // Positive for credits, negative for debits
-  type: 'deposit' | 'withdrawal' | 'transfer' | 'payment' | 'charge' | 'refund';
+  type: 'deposit' | 'withdrawal' | 'transfer' | 'payment' | 'charge' | 'refund' | 'adjustment_increase' | 'adjustment_decrease';
   description: string;
   category?: string;
   balance: number; // Balance after this transaction
@@ -122,6 +145,9 @@ export interface Transaction {
   pending: boolean;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
+  reversedBy?: string; // ID of reversal transaction
+  reverses?: string; // ID of original transaction being reversed
 }
 
 // Transfer (between accounts)
@@ -143,6 +169,7 @@ export interface Transfer {
   status: 'pending' | 'completed' | 'failed';
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
 }
 
 export interface Budget {
@@ -203,7 +230,7 @@ export interface AppState {
   expenses: Expense[];
   incomes: Income[];
   investments: Investment[];
-  accounts: BankAccount[];
+  accounts: Account[];
   creditCards: CreditCard[];
   transactions: Transaction[];
   transfers: Transfer[];
@@ -234,10 +261,10 @@ export type ActionType =
   | { type: 'SET_INVESTMENTS'; payload: Investment[] }
 
   // Bank Account Actions
-  | { type: 'ADD_ACCOUNT'; payload: BankAccount }
-  | { type: 'UPDATE_ACCOUNT'; payload: BankAccount }
+  | { type: 'ADD_ACCOUNT'; payload: Account }
+  | { type: 'UPDATE_ACCOUNT'; payload: Account }
   | { type: 'DELETE_ACCOUNT'; payload: string }
-  | { type: 'SET_ACCOUNTS'; payload: BankAccount[] }
+  | { type: 'SET_ACCOUNTS'; payload: Account[] }
 
   // Credit Card Actions
   | { type: 'ADD_CREDIT_CARD'; payload: CreditCard }

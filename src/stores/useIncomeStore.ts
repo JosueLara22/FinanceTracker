@@ -1,9 +1,12 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { v4 as uuidv4 } from 'uuid';
 import { Income } from '../types';
 import { db } from '../data/db';
-import { useTransactionStore } from './useTransactionStore';
+import {
+  createIncome as createIncomeUtil,
+  updateIncome as updateIncomeUtil,
+  deleteIncome as deleteIncomeUtil,
+} from '../utils/incomeOperations';
 import { useAccountStore } from './useAccountStore';
 
 interface IncomeState {
@@ -38,7 +41,10 @@ export const useIncomeStore = create<IncomeState>()(
       loadIncomes: async () => {
         try {
           set({ isLoading: true, error: null });
-          const incomes = await db.incomes.toArray();
+          // Filter out soft-deleted incomes
+          const incomes = await db.incomes
+            .filter(i => !i.deletedAt)
+            .toArray();
           set({ incomes, isLoading: false });
         } catch (error) {
           set({
@@ -52,36 +58,19 @@ export const useIncomeStore = create<IncomeState>()(
         try {
           set({ isLoading: true, error: null });
 
-          const newIncome: Income = {
-            ...incomeData,
-            id: uuidv4(),
-          };
-
-          await db.incomes.add(newIncome);
-
-          // Create transaction if account is linked
-          if (newIncome.accountId) {
-            const transactionStore = useTransactionStore.getState();
-
-            // Create transaction
-            await transactionStore.addTransaction({
-              accountId: newIncome.accountId,
-              accountType: 'bank',
-              date: newIncome.date,
-              amount: newIncome.amount, // Positive for income
-              type: 'deposit',
-              description: newIncome.description,
-              category: newIncome.category,
-              balance: 0, // This will be recalculated
-              incomeId: newIncome.id,
-              pending: false,
-            });
-          }
+          // Use the robust utility function
+          const newIncome = await createIncomeUtil(incomeData);
 
           set((state) => ({
             incomes: [...state.incomes, newIncome],
             isLoading: false,
           }));
+
+          // Reload accounts to reflect balance changes
+          if (newIncome.accountId) {
+            const accountStore = useAccountStore.getState();
+            await accountStore.loadAccounts();
+          }
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Failed to add income',
@@ -95,14 +84,24 @@ export const useIncomeStore = create<IncomeState>()(
         try {
           set({ isLoading: true, error: null });
 
-          await db.incomes.update(id, updates);
+          // Get old income to check if account changed
+          const oldIncome = get().getIncomeById(id);
+
+          // Use the robust utility function
+          const updatedIncome = await updateIncomeUtil(id, updates);
 
           set((state) => ({
             incomes: state.incomes.map((income) =>
-              income.id === id ? { ...income, ...updates } : income
+              income.id === id ? updatedIncome : income
             ),
             isLoading: false,
           }));
+
+          // Reload accounts to reflect balance changes
+          if (oldIncome?.accountId || updatedIncome.accountId) {
+            const accountStore = useAccountStore.getState();
+            await accountStore.loadAccounts();
+          }
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Failed to update income',
@@ -116,12 +115,23 @@ export const useIncomeStore = create<IncomeState>()(
         try {
           set({ isLoading: true, error: null });
 
-          await db.incomes.delete(id);
+          // Get income before deleting to check if it has an account
+          const income = get().getIncomeById(id);
 
+          // Use the robust utility function (soft delete)
+          await deleteIncomeUtil(id);
+
+          // Filter out the deleted income from the state
           set((state) => ({
             incomes: state.incomes.filter((income) => income.id !== id),
             isLoading: false,
           }));
+
+          // Reload accounts to reflect balance changes
+          if (income?.accountId) {
+            const accountStore = useAccountStore.getState();
+            await accountStore.loadAccounts();
+          }
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Failed to delete income',

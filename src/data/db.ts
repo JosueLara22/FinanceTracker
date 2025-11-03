@@ -34,6 +34,8 @@ export class FinancialDatabase extends Dexie {
 
   constructor() {
     super('FinancialTrackerDB');
+
+    // Version 1: Initial schema
     this.version(1).stores({
       expenses: 'id, date, category, paymentMethod, accountId',
       incomes: 'id, date, category, source, accountId',
@@ -48,6 +50,7 @@ export class FinancialDatabase extends Dexie {
       userSettings: 'id',
     });
 
+<<<<<<< Updated upstream
     // Version 2: Add investment snapshots
     this.version(2).stores({
       expenses: 'id, date, category, paymentMethod, accountId',
@@ -76,6 +79,24 @@ export class FinancialDatabase extends Dexie {
       creditCards: 'id, bank, cardName',
       transactions: 'id, accountId, date, type, transferId, expenseId, incomeId',
       transfers: 'id, fromAccountId, toAccountId, date, status',
+      budgets: 'id, category, period',
+      savingsGoals: 'id, name, priority',
+      categories: 'id, name, type',
+      userSettings: 'id',
+    });
+
+    // Version 4: Add robustness fields (deletedAt, needsRecalculation, hasDiscrepancy, reversedBy, reverses)
+    this.version(4).stores({
+      expenses: 'id, date, category, paymentMethod, accountId, deletedAt',
+      incomes: 'id, date, category, source, accountId, deletedAt',
+      investments: 'id, platform, type, sourceAccountId',
+      investmentSnapshots: 'id, investmentId, date, [investmentId+date]',
+      investmentContributions: 'id, investmentId, date, sourceAccountId',
+      investmentWithdrawals: 'id, investmentId, date, destinationAccountId',
+      accounts: 'id, bank, accountType, deletedAt',
+      creditCards: 'id, bank, cardName, deletedAt',
+      transactions: 'id, accountId, date, type, transferId, expenseId, incomeId, deletedAt, pending',
+      transfers: 'id, fromAccountId, toAccountId, date, status, deletedAt',
       budgets: 'id, category, period',
       savingsGoals: 'id, name, priority',
       categories: 'id, name, type',

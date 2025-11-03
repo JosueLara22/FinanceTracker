@@ -26,16 +26,28 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
   const { accounts, creditCards, loadAccounts, loadCreditCards } = useAccountStore();
   const expenseCategories = categories.filter(c => c.type === 'expense');
 
-  // Get selected category details
+  const cashAccounts = accounts.filter(a => a.type === 'cash' && a.isActive);
+  const bankAccounts = accounts.filter(a => a.type === 'bank' && a.isActive);
+
   const selectedCategory = expenseCategories.find(c => c.name === category);
 
-  // Load accounts and credit cards
   useEffect(() => {
     loadAccounts();
     loadCreditCards();
   }, [loadAccounts, loadCreditCards]);
 
-  // Initialize form with expense data if editing
+  // Auto-select the single cash account if payment method is cash
+  useEffect(() => {
+    if (paymentMethod === 'cash') {
+      if (cashAccounts.length === 1) {
+        setAccountId(cashAccounts[0].id);
+      } else {
+        // If no cash account or more than one, clear the accountId
+        setAccountId(''); 
+      }
+    }
+  }, [paymentMethod, cashAccounts]);
+
   useEffect(() => {
     if (expense) {
       setDescription(expense.description);
@@ -49,6 +61,12 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
       setRecurring(expense.recurring || false);
     }
   }, [expense]);
+
+  useEffect(() => {
+    if (expense && paymentMethod === 'credit' && creditCards.length > 0) {
+      setAccountId(expense.accountId || '');
+    }
+  }, [expense, paymentMethod, creditCards]);
 
   const handleAddTag = () => {
     const trimmedTag = tagInput.trim();
@@ -71,8 +89,8 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!description || !amount || !date || !category) {
-      alert('Por favor completa todos los campos requeridos (Descripción, Monto, Fecha, Categoría).');
+    if (!description || !amount || !date || !category || (paymentMethod !== 'other' && !accountId)) {
+      alert('Por favor completa todos los campos requeridos. Si pagas en efectivo, asegúrate de haber creado una cuenta de efectivo.');
       return;
     }
 
@@ -90,9 +108,8 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
     }
 
     const now = new Date();
-    const timezoneOffset = new Date().getTimezoneOffset() * 60000;
     onAddExpense({
-      date: new Date(new Date(date).getTime() + timezoneOffset),
+      date: new Date(`${date}T00:00:00`),
       amount: parseFloat(amount),
       category,
       subcategory: subcategory || undefined,
@@ -105,7 +122,6 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
       updatedAt: now,
     });
 
-    // Reset form if not editing
     if (!expense) {
       setDescription('');
       setAmount('');
@@ -230,8 +246,11 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
           <select
             value={paymentMethod}
             onChange={(e) => {
-              setPaymentMethod(e.target.value as 'cash' | 'debit' | 'credit' | 'transfer' | 'other');
-              setAccountId(''); // Reset account when payment method changes
+              const newPaymentMethod = e.target.value as 'cash' | 'debit' | 'credit' | 'transfer' | 'other';
+              setPaymentMethod(newPaymentMethod);
+              if (!expense || newPaymentMethod !== expense.paymentMethod) {
+                setAccountId('');
+              }
             }}
             className="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary-DEFAULT focus:border-transparent"
             required
@@ -244,7 +263,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
           </select>
         </div>
 
-        {/* Account/Card Selector - Show only for debit, credit, or transfer */}
+        {/* Account/Card Selector - Hidden for 'cash' */}
         {(paymentMethod === 'debit' || paymentMethod === 'credit' || paymentMethod === 'transfer') && (
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -256,17 +275,17 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
               className="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary-DEFAULT focus:border-transparent"
               required
             >
-              <option value="">Seleccionar {paymentMethod === 'credit' ? 'tarjeta' : 'cuenta'}</option>
+              <option value="">Seleccionar cuenta</option>
               {paymentMethod === 'credit' ? (
                 creditCards.map(card => (
                   <option key={card.id} value={card.id}>
-                    {card.bank} {card.cardName} ****{card.lastFourDigits}
+                    {card.cardName} ({card.bank})
                   </option>
                 ))
               ) : (
-                accounts.filter(a => a.isActive).map(account => (
+                bankAccounts.map(account => (
                   <option key={account.id} value={account.id}>
-                    {account.bank} ****{account.accountNumber} ({account.accountType})
+                    {account.name} ({account.bankName})
                   </option>
                 ))
               )}

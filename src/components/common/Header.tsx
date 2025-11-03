@@ -15,34 +15,29 @@ export const Header = () => {
 
   return (
     <header className="bg-gray-50 dark:bg-gray-900 shadow-md">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-primary-DEFAULT dark:text-primary-dark">Control Financiero</h1>
-        <nav className="flex space-x-4">
-          <NavLink to="/" className={navLinkClasses}>
+<<<<<<< Updated upstream
+      <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-primary-DEFAULT dark:text-primary-dark">Control Financiero</h1>
+        <nav class="flex space-x-4">
+          <NavLink to="/" class={navLinkClasses}>
             Panel
           </NavLink>
-          <NavLink to="/expenses" className={navLinkClasses}>
+          <NavLink to="/expenses" class={navLinkClasses}>
             Gastos
           </NavLink>
-          <NavLink to="/income" className={navLinkClasses}>
+          <NavLink to="/income" class={navLinkClasses}>
             Ingresos
           </NavLink>
-          <NavLink to="/investments" className={navLinkClasses}>
+          <NavLink to="/investments" class={navLinkClasses}>
             Inversiones
           </NavLink>
-          <NavLink to="/accounts" className={navLinkClasses}>
+          <NavLink to="/accounts" class={navLinkClasses}>
             Cuentas
           </NavLink>
-          <NavLink to="/categories" className={navLinkClasses}>
+          <NavLink to="/categories" class={navLinkClasses}>
             Categorías
           </NavLink>
         </nav>
-        <button
-          onClick={toggleTheme}
-          className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 transition-colors duration-300"
-        >
-          {theme === 'light' ? <Moon /> : <Sun />}
-        </button>
       </div>
     </header>
   );

@@ -1,9 +1,12 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { v4 as uuidv4 } from 'uuid';
 import { Expense } from '../types';
 import { db } from '../data/db';
-import { useTransactionStore } from './useTransactionStore';
+import {
+  createExpense as createExpenseUtil,
+  updateExpense as updateExpenseUtil,
+  deleteExpense as deleteExpenseUtil,
+} from '../utils/expenseOperations';
 import { useAccountStore } from './useAccountStore';
 
 interface ExpenseState {
@@ -38,7 +41,10 @@ export const useExpenseStore = create<ExpenseState>()(
       loadExpenses: async () => {
         try {
           set({ isLoading: true, error: null });
-          const expenses = await db.expenses.toArray();
+          // Filter out soft-deleted expenses
+          const expenses = await db.expenses
+            .filter(e => !e.deletedAt)
+            .toArray();
           set({ expenses, isLoading: false });
         } catch (error) {
           set({
@@ -52,39 +58,23 @@ export const useExpenseStore = create<ExpenseState>()(
         try {
           set({ isLoading: true, error: null });
 
-          const newExpense: Expense = {
-            ...expenseData,
-            id: uuidv4(),
-          };
-
-          await db.expenses.add(newExpense);
-
-          // Create transaction if account is linked
-          if (newExpense.accountId && (newExpense.paymentMethod === 'debit' || newExpense.paymentMethod === 'credit' || newExpense.paymentMethod === 'transfer' || newExpense.paymentMethod === 'cash')) {
-            const transactionStore = useTransactionStore.getState();
-            const accountStore = useAccountStore.getState();
-
-            const accountType = newExpense.paymentMethod === 'credit' ? 'credit' : 'bank';
-
-            // Create transaction
-            await transactionStore.addTransaction({
-              accountId: newExpense.accountId,
-              accountType: accountType,
-              date: newExpense.date,
-              amount: -newExpense.amount, // Negative for expense
-              type: accountType === 'credit' ? 'charge' : 'withdrawal',
-              description: newExpense.description,
-              category: newExpense.category,
-              balance: 0, // This will be recalculated
-              expenseId: newExpense.id,
-              pending: false,
-            });
-          }
+<<<<<<< Updated upstream
+          // Use the robust utility function
+          const newExpense = await createExpenseUtil(expenseData);
 
           set((state) => ({
             expenses: [...state.expenses, newExpense],
             isLoading: false,
           }));
+
+          // Reload accounts to reflect balance changes
+          if (newExpense.accountId) {
+            console.log('[ExpenseStore] Reloading accounts after expense creation');
+            const accountStore = useAccountStore.getState();
+            await accountStore.loadAccounts();
+            await accountStore.loadCreditCards();
+            console.log('[ExpenseStore] Accounts reloaded');
+          }
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Failed to add expense',
@@ -98,14 +88,27 @@ export const useExpenseStore = create<ExpenseState>()(
         try {
           set({ isLoading: true, error: null });
 
-          await db.expenses.update(id, updates);
+          // Get old expense to check if account changed
+          const oldExpense = get().getExpenseById(id);
+
+          // Use the robust utility function
+          const updatedExpense = await updateExpenseUtil(id, updates);
 
           set((state) => ({
             expenses: state.expenses.map((expense) =>
-              expense.id === id ? { ...expense, ...updates } : expense
+              expense.id === id ? updatedExpense : expense
             ),
             isLoading: false,
           }));
+
+          // Reload accounts to reflect balance changes
+          if (oldExpense?.accountId || updatedExpense.accountId) {
+            console.log('[ExpenseStore] Reloading accounts after expense update');
+            const accountStore = useAccountStore.getState();
+            await accountStore.loadAccounts();
+            await accountStore.loadCreditCards();
+            console.log('[ExpenseStore] Accounts reloaded');
+          }
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Failed to update expense',
@@ -119,12 +122,26 @@ export const useExpenseStore = create<ExpenseState>()(
         try {
           set({ isLoading: true, error: null });
 
-          await db.expenses.delete(id);
+          // Get expense before deleting to check if it has an account
+          const expense = get().getExpenseById(id);
 
+          // Use the robust utility function (soft delete)
+          await deleteExpenseUtil(id);
+
+          // Filter out the deleted expense from the state
           set((state) => ({
             expenses: state.expenses.filter((expense) => expense.id !== id),
             isLoading: false,
           }));
+
+          // Reload accounts to reflect balance changes
+          if (expense?.accountId) {
+            console.log('[ExpenseStore] Reloading accounts after expense deletion');
+            const accountStore = useAccountStore.getState();
+            await accountStore.loadAccounts();
+            await accountStore.loadCreditCards();
+            console.log('[ExpenseStore] Accounts reloaded');
+          }
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Failed to delete expense',

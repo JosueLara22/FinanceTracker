@@ -1,56 +1,29 @@
 import React from 'react';
-import { BankAccount } from '../../types';
-import { Wallet, TrendingUp, CreditCard, Landmark } from 'lucide-react';
+import { Account } from '../../types';
+import { Wallet } from 'lucide-react';
 import { QuickBalanceUpdate } from './QuickBalanceUpdate';
 import { useAccountStore } from '../../stores';
+import { createBalanceAdjustment } from '../../utils/transactionUtils';
 
 interface AccountListProps {
-  accounts: BankAccount[];
-  onEditAccount: (account: BankAccount) => void;
+  accounts: Account[];
+  onEditAccount: (account: Account) => void;
   onDeleteAccount: (id: string) => void;
 }
 
 export const AccountList: React.FC<AccountListProps> = ({ accounts, onEditAccount, onDeleteAccount }) => {
-  const { updateAccount } = useAccountStore();
+  const { loadAccounts } = useAccountStore();
 
   const handleQuickBalanceUpdate = async (id: string, newBalance: number) => {
     try {
-      await updateAccount(id, {
-        balance: newBalance,
-        lastUpdate: new Date(),
-      });
+      // Create balance adjustment transaction
+      await createBalanceAdjustment(id, newBalance);
+
+      // Reload accounts to reflect the change
+      await loadAccounts();
     } catch (error) {
+      console.error('[AccountList] Failed to update balance:', error);
       alert('Failed to update balance. Please try again.');
-    }
-  };
-
-  const getAccountIcon = (type: string) => {
-    switch (type) {
-      case 'checking':
-        return <Wallet className="h-6 w-6" />;
-      case 'savings':
-        return <Landmark className="h-6 w-6" />;
-      case 'investment':
-        return <TrendingUp className="h-6 w-6" />;
-      case 'credit card':
-        return <CreditCard className="h-6 w-6" />;
-      default:
-        return <Wallet className="h-6 w-6" />;
-    }
-  };
-
-  const getAccountTypeColor = (type: string) => {
-    switch (type) {
-      case 'checking':
-        return 'text-blue-500';
-      case 'savings':
-        return 'text-green-500';
-      case 'investment':
-        return 'text-purple-500';
-      case 'credit card':
-        return 'text-orange-500';
-      default:
-        return 'text-gray-500';
     }
   };
 
@@ -75,9 +48,6 @@ export const AccountList: React.FC<AccountListProps> = ({ accounts, onEditAccoun
           data-testid={`account-card-${account.id}`}>
 
           <div className="flex items-start justify-between mb-4">
-            <div className={`p-3 rounded-full bg-gray-100 dark:bg-gray-700 ${getAccountTypeColor(account.accountType)}`}>
-              {getAccountIcon(account.accountType)}
-            </div>
             {!account.isActive && (
               <span className="px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-200 rounded-full">
                 Inactive
@@ -86,14 +56,12 @@ export const AccountList: React.FC<AccountListProps> = ({ accounts, onEditAccoun
           </div>
 
           <div className="mb-4">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{account.bank}</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 capitalize mb-2">{account.accountType}</p>
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              Account: {account.accountNumber}
-            </p>
-          </div>
-
-          <div className="mb-4">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+              {account.name}
+            </h3>
+            {account.type === 'bank' && account.bankName && (
+              <p className="text-sm text-gray-500 dark:text-gray-400">{account.bankName}</p>
+            )}
             <div className="flex items-center justify-between mb-1">
               <p className="text-sm text-gray-500 dark:text-gray-400">Current Balance</p>
               <QuickBalanceUpdate

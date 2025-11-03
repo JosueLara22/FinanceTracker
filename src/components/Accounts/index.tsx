@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAccountStore } from '../../stores';
 import { AccountList } from './AccountList';
 import { AccountForm } from './AccountForm';
@@ -12,6 +13,7 @@ type TabType = 'overview' | 'accounts' | 'cards';
 
 export const Accounts: React.FC = () => {
   const { accounts, creditCards, deleteAccount, deleteCreditCard } = useAccountStore();
+  const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [isAccountFormOpen, setIsAccountFormOpen] = useState(false);
@@ -69,6 +71,11 @@ export const Accounts: React.FC = () => {
   const handleCloseCreditCardForm = () => {
     setIsCreditCardFormOpen(false);
     setCardToEdit(null);
+  };
+
+  const handleMakePayment = (card: CreditCard) => {
+    // Navigate to transfers page with credit card pre-selected
+    navigate('/transfers', { state: { toCreditCard: card } });
   };
 
   const tabs = [
@@ -148,6 +155,7 @@ export const Accounts: React.FC = () => {
             creditCards={creditCards}
             onEditCard={handleEditCreditCard}
             onDeleteCard={handleDeleteCreditCard}
+            onMakePayment={handleMakePayment}
           />
         )}
       </div>

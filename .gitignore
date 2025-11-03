@@ -24,7 +24,7 @@ dist-ssr
 *.sw?
 
 # Screenshots and temporary files
-*.png
+#*.png
 nul
 phase4Completion.md
 

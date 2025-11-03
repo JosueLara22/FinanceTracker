@@ -22,13 +22,20 @@ body {
   display: flex;
   min-width: 320px;
   min-height: 100vh;
+  background-color: #f8f9fa; /* gray-50 */
 }
 
 #root {
   width: 100%;
+  min-height: 100vh;
+  background-color: #f8f9fa; /* gray-50 */
 }
 
 .dark body {
   background-color: #1a1d20; /* gray-900 */
   color: #e9ecef; /* gray-100 */
+}
+
+.dark #root {
+  background-color: #1a1d20; /* gray-900 */
 }

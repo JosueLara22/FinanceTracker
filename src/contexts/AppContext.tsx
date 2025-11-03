@@ -17,6 +17,8 @@ const initialAppState: AppState = {
   investments: [],
   accounts: [],
   creditCards: [],
+  transactions: [],
+  transfers: [],
   budgets: [],
   savingsGoals: [],
   categories: [],

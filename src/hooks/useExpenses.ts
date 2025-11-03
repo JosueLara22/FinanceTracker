@@ -1,35 +1,33 @@
 
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../data/db';
+import { useExpenseStore } from '../stores/useExpenseStore';
 import { Expense } from '../types';
 
 export function useExpenses() {
-  const expenses = useLiveQuery(() => db.expenses.toArray(), []);
+  const {
+    expenses,
+    addExpense: storeAddExpense,
+    updateExpense: storeUpdateExpense,
+    deleteExpense: storeDeleteExpense,
+    getExpenseById
+  } = useExpenseStore();
 
   const addExpense = async (expense: Omit<Expense, 'id'>) => {
-    const newId = crypto.randomUUID();
-    const newExpense: Expense = { ...expense, id: newId };
-    await db.expenses.add(newExpense);
-    return newId;
+    await storeAddExpense(expense);
   };
 
   const updateExpense = async (id: string, updates: Partial<Expense>) => {
-    await db.expenses.update(id, updates);
+    await storeUpdateExpense(id, updates);
   };
 
   const deleteExpense = async (id: string) => {
-    await db.expenses.delete(id);
+    await storeDeleteExpense(id);
   };
 
-  const getExpenseById = (id: string) => {
-    return db.expenses.get(id);
-  };
-
-  return { 
-    expenses: expenses || [], 
-    addExpense, 
-    updateExpense, 
-    deleteExpense, 
-    getExpenseById 
+  return {
+    expenses,
+    addExpense,
+    updateExpense,
+    deleteExpense,
+    getExpenseById
   };
 }

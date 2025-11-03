@@ -72,7 +72,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({ accountId, lim
   const getAccountName = (transaction: Transaction): string => {
     if (transaction.accountType === 'bank') {
       const account = accounts.find(a => a.id === transaction.accountId);
-      return account ? `${account.bank} ****${account.accountNumber}` : 'Unknown Account';
+      return account ? `${account.bankName || account.name} ${account.accountNumber ? `****${account.accountNumber}` : ''}` : 'Unknown Account';
     } else {
       const card = creditCards.find(c => c.id === transaction.accountId);
       return card ? `${card.bank} ${card.cardName}` : 'Unknown Card';

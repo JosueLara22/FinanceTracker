@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Expense } from '../../types';
 import { formatCurrency, formatDate } from '../../utils/formatters';
+import { useAccountStore } from '../../stores/useAccountStore';
 
 interface ExpenseListProps {
   expenses: Expense[];
@@ -13,6 +14,32 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
   onDeleteExpense,
   onEditExpense
 }) => {
+  const { accounts, creditCards, loadAccounts, loadCreditCards } = useAccountStore();
+
+  useEffect(() => {
+    loadAccounts();
+    loadCreditCards();
+  }, [loadAccounts, loadCreditCards]);
+
+  const getAccountName = (expense: Expense): string | null => {
+    if (!expense.accountId) return null;
+
+    // Check if it's a credit card (when payment method is credit)
+    if (expense.paymentMethod === 'credit') {
+      const card = creditCards.find(c => c.id === expense.accountId);
+      return card ? `${card.cardName} (${card.bank})` : null;
+    }
+
+    // Otherwise, it's a bank/cash account
+    const account = accounts.find(a => a.id === expense.accountId);
+    if (!account) return null;
+
+    if (account.type === 'cash') {
+      return account.name;
+    } else {
+      return `${account.name} (${account.bankName})`;
+    }
+  };
   if (expenses.length === 0) {
     return (
       <div className="text-center py-12">
@@ -54,6 +81,14 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                     <span>{formatDate(expense.date)}</span>
                     <span>•</span>
                     <span>{expense.paymentMethod}</span>
+                    {getAccountName(expense) && (
+                      <>
+                        <span>•</span>
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                          {getAccountName(expense)}
+                        </span>
+                      </>
+                    )}
                   </div>
                   {expense.tags && expense.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">

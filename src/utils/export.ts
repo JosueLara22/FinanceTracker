@@ -112,9 +112,9 @@ export const exportInvestmentsToCSV = (investments: Investment[], filename?: str
  */
 export const exportAccountsToCSV = (accounts: BankAccount[], filename?: string) => {
   const data = accounts.map(account => ({
-    Banco: account.bank,
-    'Tipo de Cuenta': account.accountType,
-    'Número de Cuenta': account.accountNumber,
+    Banco: account.bankName || account.name,
+    'Tipo de Cuenta': account.accountType || account.type,
+    'Número de Cuenta': account.accountNumber || '',
     Saldo: account.balance,
     Moneda: account.currency,
     'Última Actualización': formatDate(account.lastUpdate),

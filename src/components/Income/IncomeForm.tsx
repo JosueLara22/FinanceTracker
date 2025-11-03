@@ -121,7 +121,7 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ income, onAddIncome, onC
           <option value="">Select Account (Optional)</option>
           {accounts.filter(a => a.isActive).map(account => (
             <option key={account.id} value={account.id}>
-              {account.bank} ****{account.accountNumber} ({account.accountType})
+              {account.bankName || account.name} {account.accountNumber ? `****${account.accountNumber}` : ''} {account.accountType ? `(${account.accountType})` : ''}
             </option>
           ))}
         </select>

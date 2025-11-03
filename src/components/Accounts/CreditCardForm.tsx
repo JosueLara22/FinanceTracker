@@ -162,7 +162,6 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({ onClose, cardToE
             onChange={(e) => setCurrentBalance(parseFloat(e.target.value) || 0)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-DEFAULT focus:ring-primary-DEFAULT dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             step="0.01"
-            min="0"
           />
         </div>
       </div>

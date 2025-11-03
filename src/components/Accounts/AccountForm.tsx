@@ -1,57 +1,81 @@
 import React, { useState, useEffect } from 'react';
 import { useAccountStore } from '../../stores';
-import { BankAccount } from '../../types';
+import { Account } from '../../types';
 
 interface AccountFormProps {
   onClose: () => void;
-  accountToEdit?: BankAccount | null;
+  accountToEdit?: Account | null;
 }
 
 export const AccountForm: React.FC<AccountFormProps> = ({ onClose, accountToEdit }) => {
-  const { addAccount, updateAccount } = useAccountStore();
+  const { accounts, addAccount, updateAccount } = useAccountStore();
 
-  const [bank, setBank] = useState('');
-  const [accountType, setAccountType] = useState<'checking' | 'savings' | 'investment' | 'credit card'>('checking');
-  const [accountNumber, setAccountNumber] = useState('');
+  const [type, setType] = useState<'bank' | 'cash'>('bank');
+  const [name, setName] = useState('');
   const [balance, setBalance] = useState<number>(0);
   const [currency, setCurrency] = useState<'MXN' | 'USD'>('MXN');
   const [isActive, setIsActive] = useState(true);
 
-  // Load existing account data if editing
+  const [bankName, setBankName] = useState('');
+  const [accountType, setAccountType] = useState<'checking' | 'savings'>('checking');
+  const [accountNumber, setAccountNumber] = useState('');
+
+  // Check if a cash account already exists, excluding the one being edited
+  const cashAccountExists = accounts.some(acc => acc.type === 'cash' && acc.id !== accountToEdit?.id);
+
   useEffect(() => {
     if (accountToEdit) {
-      setBank(accountToEdit.bank);
-      setAccountType(accountToEdit.accountType);
-      setAccountNumber(accountToEdit.accountNumber);
+      setType(accountToEdit.type);
+      setName(accountToEdit.name);
       setBalance(accountToEdit.balance);
       setCurrency(accountToEdit.currency);
       setIsActive(accountToEdit.isActive);
+      
+      if (accountToEdit.type === 'bank') {
+        setBankName(accountToEdit.bankName || '');
+        setAccountType(accountToEdit.accountType || 'checking');
+        setAccountNumber(accountToEdit.accountNumber || '');
+      }
     }
   }, [accountToEdit]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!bank || !accountNumber || balance < 0) {
-      alert('Please fill in all fields correctly.');
+    if (!name || (type === 'bank' && (!bankName || !accountNumber))) {
+      alert('Please fill in all required fields.');
       return;
     }
 
-    const accountData = {
-      bank,
-      accountType,
-      accountNumber,
+    const commonData = {
+      name,
+      type,
       balance,
       currency,
-      lastUpdate: new Date(),
       isActive,
+      lastUpdate: new Date(),
+      createdAt: accountToEdit?.createdAt || new Date(),
+      updatedAt: new Date(),
     };
+
+    let accountData: Partial<Account>;
+
+    if (type === 'bank') {
+      accountData = {
+        ...commonData,
+        bankName,
+        accountType,
+        accountNumber,
+      };
+    } else {
+      accountData = commonData;
+    }
 
     try {
       if (accountToEdit) {
         await updateAccount(accountToEdit.id, accountData);
       } else {
-        await addAccount(accountData);
+        await addAccount(accountData as Omit<Account, 'id'>);
       }
       onClose();
     } catch (error) {
@@ -63,52 +87,87 @@ export const AccountForm: React.FC<AccountFormProps> = ({ onClose, accountToEdit
   return (
     <form onSubmit={handleSubmit} className="space-y-4" data-testid="account-form">
       <div>
-        <label htmlFor="bank" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Bank Name
-        </label>
-        <input
-          type="text"
-          id="bank"
-          value={bank}
-          onChange={(e) => setBank(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-DEFAULT focus:ring-primary-DEFAULT dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          placeholder="e.g., BBVA, Santander, Nu"
-          required
-        />
-      </div>
-
-      <div>
-        <label htmlFor="accountType" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Account Type
         </label>
         <select
-          id="accountType"
-          value={accountType}
-          onChange={(e) => setAccountType(e.target.value as 'checking' | 'savings' | 'investment' | 'credit card')}
+          id="type"
+          value={type}
+          onChange={(e) => setType(e.target.value as 'bank' | 'cash')}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-DEFAULT focus:ring-primary-DEFAULT dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          disabled={!!accountToEdit} // Disable type change when editing
         >
-          <option value="checking">Checking</option>
-          <option value="savings">Savings</option>
-          <option value="investment">Investment</option>
-          <option value="credit card">Credit Card</option>
+          <option value="bank">Bank Account</option>
+          <option value="cash" disabled={cashAccountExists} title={cashAccountExists ? "You can only have one cash account." : ''}>
+            Cash
+          </option>
         </select>
       </div>
 
       <div>
-        <label htmlFor="accountNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Account Number (Last 4 digits)
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Account Name
         </label>
         <input
           type="text"
-          id="accountNumber"
-          value={accountNumber}
-          onChange={(e) => setAccountNumber(e.target.value)}
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-DEFAULT focus:ring-primary-DEFAULT dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          placeholder="****1234"
-          maxLength={8}
+          placeholder={type === 'cash' ? "e.g., My Wallet, Efectivo" : "e.g., BBVA Debit, Santander Credit"}
           required
         />
       </div>
+
+      {type === 'bank' && (
+        <>
+          <div>
+            <label htmlFor="bankName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Bank Name
+            </label>
+            <input
+              type="text"
+              id="bankName"
+              value={bankName}
+              onChange={(e) => setBankName(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-DEFAULT focus:ring-primary-DEFAULT dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="e.g., BBVA, Santander, Nu"
+              required={type === 'bank'}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="accountType" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Bank Account Type
+            </label>
+            <select
+              id="accountType"
+              value={accountType}
+              onChange={(e) => setAccountType(e.target.value as 'checking' | 'savings')}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-DEFAULT focus:ring-primary-DEFAULT dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            >
+              <option value="checking">Checking</option>
+              <option value="savings">Savings</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="accountNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Account Number (Last 4 digits)
+            </label>
+            <input
+              type="text"
+              id="accountNumber"
+              value={accountNumber}
+              onChange={(e) => setAccountNumber(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-DEFAULT focus:ring-primary-DEFAULT dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="****1234"
+              maxLength={4}
+              required={type === 'bank'}
+            />
+          </div>
+        </>
+      )}
 
       <div className="grid grid-cols-2 gap-4">
         <div>

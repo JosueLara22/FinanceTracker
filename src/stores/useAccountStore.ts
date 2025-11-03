@@ -3,6 +3,7 @@ import { devtools } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { BankAccount, CreditCard, Budget, SavingsGoal } from '../types';
 import { db } from '../data/db';
+import { useTransactionStore } from './useTransactionStore';
 
 interface AccountState {
   // Bank Accounts
@@ -52,6 +53,7 @@ interface AccountState {
   // Calculations
   calculateNetWorth: () => number;
   calculateTotalCreditUtilization: () => number;
+  recalculateAllCreditCardBalances: () => Promise<void>;
 }
 
 export const useAccountStore = create<AccountState>()(
@@ -75,7 +77,11 @@ export const useAccountStore = create<AccountState>()(
       loadAccounts: async () => {
         try {
           set({ isLoading: true, error: null });
-          const accounts = await db.accounts.toArray();
+          // Filter out soft-deleted accounts
+          const accounts = await db.accounts
+            .filter(a => !a.deletedAt)
+            .toArray();
+          console.log('[AccountStore] Loaded accounts:', accounts.length, accounts);
           set({ accounts, isLoading: false });
         } catch (error) {
           set({
@@ -147,7 +153,11 @@ export const useAccountStore = create<AccountState>()(
       loadCreditCards: async () => {
         try {
           set({ isLoading: true, error: null });
-          const creditCards = await db.creditCards.toArray();
+          // Filter out soft-deleted credit cards
+          const creditCards = await db.creditCards
+            .filter(c => !c.deletedAt)
+            .toArray();
+          console.log('[AccountStore] Loaded credit cards:', creditCards.length, creditCards);
           set({ creditCards, isLoading: false });
         } catch (error) {
           set({
@@ -386,6 +396,14 @@ export const useAccountStore = create<AccountState>()(
         );
 
         return totalLimit > 0 ? (totalUsed / totalLimit) * 100 : 0;
+      },
+
+      recalculateAllCreditCardBalances: async () => {
+        const { creditCards } = get();
+        const transactionStore = useTransactionStore.getState();
+        for (const card of creditCards) {
+          await transactionStore.recalculateAccountBalance(card.id);
+        }
       },
     }),
     { name: 'AccountStore' }
