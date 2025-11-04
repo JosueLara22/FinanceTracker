@@ -151,7 +151,7 @@ export const InvestmentMigrationPrompt: React.FC = () => {
                       <option value="">-- Skip this one --</option>
                       {activeAccounts.map(account => (
                         <option key={account.id} value={account.id}>
-                          {account.bank} (****{account.accountNumber})
+                          {account.bankName} (****{account.accountNumber})
                         </option>
                       ))}
                     </select>

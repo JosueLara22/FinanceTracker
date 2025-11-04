@@ -54,7 +54,7 @@ export const InvestmentForm: React.FC<InvestmentFormProps> = ({ onAddInvestment 
     if (sourceAccountId && selectedAccount) {
       if (selectedAccount.balance < capital) {
         setError(
-          `Insufficient funds in ${selectedAccount.bank}. Available: $${selectedAccount.balance.toFixed(2)}, Required: $${capital.toFixed(2)}`
+          `Insufficient funds in ${selectedAccount.bankName}. Available: $${selectedAccount.balance.toFixed(2)}, Required: $${capital.toFixed(2)}`
         );
         return;
       }
@@ -123,7 +123,7 @@ export const InvestmentForm: React.FC<InvestmentFormProps> = ({ onAddInvestment 
             <option value="">-- No Account (Manual Entry) --</option>
             {availableAccounts.map((account) => (
               <option key={account.id} value={account.id}>
-                {account.bank} - {account.accountType} (****{account.accountNumber}) -
+                {account.bankName} - {account.accountType} (****{account.accountNumber}) -
                 Balance: ${account.balance.toFixed(2)} {account.currency}
               </option>
             ))}

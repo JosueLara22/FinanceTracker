@@ -14,13 +14,15 @@ export const initialUserSettings: UserSettings = {
 
 export const defaultAccounts: Omit<BankAccount, 'id'>[] = [
   {
-    bank: 'Efectivo',
-    accountType: 'checking',
-    accountNumber: '0000',
+    name: 'Efectivo',
+    type: 'cash',
     balance: 0,
     currency: 'MXN',
     lastUpdate: new Date(),
     isActive: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    accountNumber: '0000',
   },
 ];
 

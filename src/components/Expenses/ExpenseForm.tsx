@@ -60,7 +60,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
       setTags(expense.tags || []);
       setRecurring(expense.recurring || false);
     }
-  }, [expense]);
+  }, [expense, accounts, creditCards]);
 
   useEffect(() => {
     if (expense && paymentMethod === 'credit' && creditCards.length > 0) {
@@ -100,7 +100,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
       // Find an account named "Efectivo" or "Cash" (case insensitive)
       const cashAccount = accounts.find(acc =>
         acc.isActive &&
-        (acc.bank.toLowerCase() === 'efectivo' || acc.bank.toLowerCase() === 'cash')
+        (acc.bankName?.toLowerCase() === 'efectivo' || acc.bankName?.toLowerCase() === 'cash')
       );
       if (cashAccount) {
         finalAccountId = cashAccount.id;
@@ -204,7 +204,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
           >
             <option value="" disabled>Seleccionar categoría</option>
             {expenseCategories.map(c => (
-              <option key={c.id} value={c.name}>{c.icon} {c.name}</option>
+              <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
             ))}
           </select>
         </div>

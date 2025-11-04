@@ -23,7 +23,7 @@ export const InvestmentList: React.FC<InvestmentListProps> = ({ investments, onD
   const getSourceAccountName = (sourceAccountId?: string) => {
     if (!sourceAccountId) return null;
     const account = accounts.find(acc => acc.id === sourceAccountId);
-    return account ? `${account.bank} (****${account.accountNumber})` : 'Account not found';
+    return account ? `${account.bankName} (****${account.accountNumber})` : 'Account not found';
   };
 
   if (investments.length === 0) {

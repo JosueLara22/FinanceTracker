@@ -50,7 +50,6 @@ export class FinancialDatabase extends Dexie {
       userSettings: 'id',
     });
 
-<<<<<<< Updated upstream
     // Version 2: Add investment snapshots
     this.version(2).stores({
       expenses: 'id, date, category, paymentMethod, accountId',

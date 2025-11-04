@@ -73,7 +73,7 @@ export async function linkInvestmentToAccount(
  * Skip migration for an investment (mark it as intentionally unlinked)
  * We don't actually mark it, but this function exists for consistency
  */
-export async function skipInvestmentMigration(investmentId: string): Promise<boolean> {
+export async function skipInvestmentMigration(): Promise<boolean> {
   // For now, we just return true. The investment will remain with undefined sourceAccountId
   // which is perfectly valid (represents manual entry)
   return true;

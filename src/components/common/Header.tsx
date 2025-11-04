@@ -1,11 +1,7 @@
 
-import { useTheme } from '../../hooks/useTheme';
-import { Sun, Moon } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 export const Header = () => {
-  const { theme, toggleTheme } = useTheme();
-
   const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
     `px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
       isActive
@@ -15,26 +11,25 @@ export const Header = () => {
 
   return (
     <header className="bg-gray-50 dark:bg-gray-900 shadow-md">
-<<<<<<< Updated upstream
-      <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-primary-DEFAULT dark:text-primary-dark">Control Financiero</h1>
-        <nav class="flex space-x-4">
-          <NavLink to="/" class={navLinkClasses}>
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-primary-DEFAULT dark:text-primary-dark">Control Financiero</h1>
+        <nav className="flex space-x-4">
+          <NavLink to="/" className={navLinkClasses}>
             Panel
           </NavLink>
-          <NavLink to="/expenses" class={navLinkClasses}>
+          <NavLink to="/expenses" className={navLinkClasses}>
             Gastos
           </NavLink>
-          <NavLink to="/income" class={navLinkClasses}>
+          <NavLink to="/income" className={navLinkClasses}>
             Ingresos
           </NavLink>
-          <NavLink to="/investments" class={navLinkClasses}>
+          <NavLink to="/investments" className={navLinkClasses}>
             Inversiones
           </NavLink>
-          <NavLink to="/accounts" class={navLinkClasses}>
+          <NavLink to="/accounts" className={navLinkClasses}>
             Cuentas
           </NavLink>
-          <NavLink to="/categories" class={navLinkClasses}>
+          <NavLink to="/categories" className={navLinkClasses}>
             Categorías
           </NavLink>
         </nav>

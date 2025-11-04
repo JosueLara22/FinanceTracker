@@ -13,7 +13,7 @@ import {
   shouldShowMigrationPrompt,
   bulkLinkInvestments
 } from './investmentMigration';
-import { Investment, BankAccount } from '../types';
+import { Investment, Account } from '../types';
 
 describe('Investment Migration Utility', () => {
   beforeEach(async () => {
@@ -156,15 +156,19 @@ describe('Investment Migration Utility', () => {
 
   describe('linkInvestmentToAccount', () => {
     it('should successfully link investment to account', async () => {
-      const account: BankAccount = {
+      const account: Account = {
         id: 'account-1',
-        bank: 'Test Bank',
+        name: 'Test Bank',
+        type: 'bank',
+        bankName: 'Test Bank',
         accountType: 'savings',
         accountNumber: '1234',
         balance: 10000,
         currency: 'MXN',
         lastUpdate: new Date(),
-        isActive: true
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       const investment: Investment = {
@@ -356,15 +360,19 @@ describe('Investment Migration Utility', () => {
 
   describe('bulkLinkInvestments', () => {
     it('should link multiple investments successfully', async () => {
-      const account: BankAccount = {
+      const account: Account = {
         id: 'account-1',
-        bank: 'Test Bank',
+        name: 'Test Bank',
+        type: 'bank',
+        bankName: 'Test Bank',
         accountType: 'savings',
         accountNumber: '1234',
         balance: 10000,
         currency: 'MXN',
         lastUpdate: new Date(),
-        isActive: true
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       const inv1: Investment = {
@@ -411,15 +419,19 @@ describe('Investment Migration Utility', () => {
     });
 
     it('should handle partial failures', async () => {
-      const account: BankAccount = {
+      const account: Account = {
         id: 'account-1',
-        bank: 'Test Bank',
+        name: 'Test Bank',
+        type: 'bank',
+        bankName: 'Test Bank',
         accountType: 'savings',
         accountNumber: '1234',
         balance: 10000,
         currency: 'MXN',
         lastUpdate: new Date(),
-        isActive: true
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       const inv1: Investment = {

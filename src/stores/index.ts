@@ -1,3 +1,7 @@
+import { db } from '../data/db';
+
+import { investmentUpdateService } from '../services/investmentUpdateService';
+
 // Import all stores
 import { useExpenseStore } from './useExpenseStore';
 import { useIncomeStore } from './useIncomeStore';
@@ -43,7 +47,6 @@ export const initializeStores = async () => {
     useAccountStore.getState().loadSavingsGoals(),
   ]);
 
-<<<<<<< Updated upstream
   // Run startup validations to check data integrity
   console.log('[Robustness] Running startup validations...');
   try {
@@ -73,7 +76,6 @@ export const initializeStores = async () => {
   // After stores are loaded, update investments with daily returns
   // This runs in the background and doesn't block the UI
   try {
-    const { investmentUpdateService } = await import('../services/investmentUpdateService');
 
     // First, backfill historical data for any investments without snapshots
     await investmentUpdateService.backfillAllInvestments();
@@ -83,7 +85,6 @@ export const initializeStores = async () => {
   } catch (error) {
     console.error('Error updating investments on initialization:', error);
     // Don't throw - allow app to continue even if investment updates fail
-  }
   }
 };
 
@@ -101,7 +102,6 @@ export const getAllStoreStates = () => {
 
 // Helper to clear all store data (useful for logout/reset)
 export const clearAllStores = async () => {
-  const { db } = await import('../data/db');
 
   // Clear all database tables
   await Promise.all([

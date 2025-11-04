@@ -90,10 +90,7 @@ async function createInvestmentTransaction(
   amount: number,
   type: 'withdrawal' | 'deposit',
   description: string,
-  newBalance: number,
-  investmentId?: string,
-  contributionId?: string,
-  withdrawalId?: string
+  newBalance: number
 ): Promise<Transaction> {
   const transaction: Transaction = {
     id: uuidv4(),
@@ -157,8 +154,7 @@ export async function createInvestmentWithAccountDeduction(
         investmentData.initialCapital,
         'withdrawal',
         `Investment in ${investmentData.platform} - ${investmentData.type}`,
-        newBalance,
-        investment.id
+        newBalance
       );
 
       // Save investment to database
@@ -228,9 +224,7 @@ export async function addContributionWithAccountDeduction(
         amount,
         'withdrawal',
         `Contribution to ${investment.platform} - ${investment.type}`,
-        newBalance,
-        investmentId
-      );
+        newBalance      );
     }
 
     // Create contribution record
@@ -310,8 +304,7 @@ export async function processWithdrawalToAccount(
         amount,
         'deposit',
         `Withdrawal from ${investment.platform} - ${investment.type}`,
-        newBalance,
-        investmentId
+        newBalance
       );
     }
 

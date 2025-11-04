@@ -195,10 +195,15 @@ export interface SavingsGoal {
 export interface Category {
   id: string;
   name: string;
-  type: 'income' | 'expense';
+  type: 'income' | 'expense' | 'both';
   icon?: string;
   color?: string;
   subcategories?: string[];
+  isDefault?: boolean;
+  order?: number;
+  budgetEnabled?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface UserSettings {

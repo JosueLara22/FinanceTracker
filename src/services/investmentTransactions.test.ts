@@ -10,7 +10,7 @@ import {
   processWithdrawalToAccount,
   getTotalInvested
 } from './investmentTransactions';
-import { BankAccount } from '../types';
+import { Account } from '../types';
 
 describe('Investment Transaction Service', () => {
   // Clean up database before and after each test
@@ -26,15 +26,19 @@ describe('Investment Transaction Service', () => {
   describe('createInvestmentWithAccountDeduction', () => {
     it('should create investment and deduct from account', async () => {
       // Create a test account
-      const account: BankAccount = {
+      const account: Account = {
         id: 'test-account-1',
-        bank: 'Test Bank',
+        name: 'Test Bank',
+        type: 'bank',
+        bankName: 'Test Bank',
         accountType: 'savings',
         accountNumber: '1234',
         balance: 10000,
         currency: 'MXN',
         lastUpdate: new Date(),
-        isActive: true
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       await db.accounts.add(account);
 
@@ -68,15 +72,19 @@ describe('Investment Transaction Service', () => {
     });
 
     it('should fail with insufficient funds', async () => {
-      const account: BankAccount = {
+      const account: Account = {
         id: 'test-account-2',
-        bank: 'Test Bank',
+        name: 'Test Bank',
+        type: 'bank',
+        bankName: 'Test Bank',
         accountType: 'savings',
         accountNumber: '5678',
         balance: 1000,
         currency: 'MXN',
         lastUpdate: new Date(),
-        isActive: true
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       await db.accounts.add(account);
 
@@ -133,15 +141,19 @@ describe('Investment Transaction Service', () => {
     });
 
     it('should fail with inactive account', async () => {
-      const account: BankAccount = {
+      const account: Account = {
         id: 'inactive-account',
-        bank: 'Test Bank',
+        name: 'Test Bank',
+        type: 'bank',
+        bankName: 'Test Bank',
         accountType: 'savings',
         accountNumber: '9999',
         balance: 10000,
         currency: 'MXN',
         lastUpdate: new Date(),
-        isActive: false
+        isActive: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       await db.accounts.add(account);
 
@@ -166,15 +178,19 @@ describe('Investment Transaction Service', () => {
   describe('addContributionWithAccountDeduction', () => {
     it('should add contribution and deduct from account', async () => {
       // Setup account and investment
-      const account: BankAccount = {
+      const account: Account = {
         id: 'test-account-3',
-        bank: 'Test Bank',
+        name: 'Test Bank',
+        type: 'bank',
+        bankName: 'Test Bank',
         accountType: 'savings',
         accountNumber: '1111',
         balance: 10000,
         currency: 'MXN',
         lastUpdate: new Date(),
-        isActive: true
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       await db.accounts.add(account);
 
@@ -211,15 +227,19 @@ describe('Investment Transaction Service', () => {
     });
 
     it('should fail contribution with insufficient funds', async () => {
-      const account: BankAccount = {
+      const account: Account = {
         id: 'test-account-4',
-        bank: 'Test Bank',
+        name: 'Test Bank',
+        type: 'bank',
+        bankName: 'Test Bank',
         accountType: 'savings',
         accountNumber: '2222',
         balance: 500,
         currency: 'MXN',
         lastUpdate: new Date(),
-        isActive: true
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       await db.accounts.add(account);
 
@@ -260,15 +280,19 @@ describe('Investment Transaction Service', () => {
       const investmentId = investmentResult.investment!.id;
 
       // Create destination account
-      const account: BankAccount = {
+      const account: Account = {
         id: 'dest-account',
-        bank: 'Test Bank',
+        name: 'Test Bank',
+        type: 'bank',
+        bankName: 'Test Bank',
         accountType: 'checking',
         accountNumber: '3333',
         balance: 1000,
         currency: 'MXN',
         lastUpdate: new Date(),
-        isActive: true
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       await db.accounts.add(account);
 

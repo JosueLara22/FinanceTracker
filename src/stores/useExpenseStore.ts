@@ -58,7 +58,6 @@ export const useExpenseStore = create<ExpenseState>()(
         try {
           set({ isLoading: true, error: null });
 
-<<<<<<< Updated upstream
           // Use the robust utility function
           const newExpense = await createExpenseUtil(expenseData);
 
