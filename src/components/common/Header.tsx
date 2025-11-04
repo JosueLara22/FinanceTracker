@@ -1,5 +1,6 @@
 
 import { NavLink } from 'react-router-dom';
+import ThemeSwitcher from './ThemeSwitcher';
 
 export const Header = () => {
   const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
@@ -33,6 +34,7 @@ export const Header = () => {
             Categorías
           </NavLink>
         </nav>
+        <ThemeSwitcher />
       </div>
     </header>
   );
