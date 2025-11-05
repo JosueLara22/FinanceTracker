@@ -92,7 +92,10 @@ export const IncomeFilters: React.FC<IncomeFiltersProps> = ({
         <button
           onClick={() => {
             const today = new Date();
-            setIncomeFilters({ dateFrom: today, dateTo: today });
+            today.setHours(0, 0, 0, 0);
+            const endOfDay = new Date();
+            endOfDay.setHours(23, 59, 59, 999);
+            setIncomeFilters({ dateFrom: today, dateTo: endOfDay });
           }}
           className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300"
         >
@@ -105,7 +108,10 @@ export const IncomeFilters: React.FC<IncomeFiltersProps> = ({
             const day = startOfWeek.getDay();
             const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
             startOfWeek.setDate(diff);
-            setIncomeFilters({ dateFrom: startOfWeek, dateTo: today });
+            startOfWeek.setHours(0, 0, 0, 0);
+            const endOfDay = new Date();
+            endOfDay.setHours(23, 59, 59, 999);
+            setIncomeFilters({ dateFrom: startOfWeek, dateTo: endOfDay });
           }}
           className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300"
         >
@@ -115,7 +121,10 @@ export const IncomeFilters: React.FC<IncomeFiltersProps> = ({
           onClick={() => {
             const today = new Date();
             const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-            setIncomeFilters({ dateFrom: startOfMonth, dateTo: today });
+            startOfMonth.setHours(0, 0, 0, 0);
+            const endOfDay = new Date();
+            endOfDay.setHours(23, 59, 59, 999);
+            setIncomeFilters({ dateFrom: startOfMonth, dateTo: endOfDay });
           }}
           className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300"
         >
@@ -125,7 +134,10 @@ export const IncomeFilters: React.FC<IncomeFiltersProps> = ({
           onClick={() => {
             const today = new Date();
             const startOfYear = new Date(today.getFullYear(), 0, 1);
-            setIncomeFilters({ dateFrom: startOfYear, dateTo: today });
+            startOfYear.setHours(0, 0, 0, 0);
+            const endOfDay = new Date();
+            endOfDay.setHours(23, 59, 59, 999);
+            setIncomeFilters({ dateFrom: startOfYear, dateTo: endOfDay });
           }}
           className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300"
         >

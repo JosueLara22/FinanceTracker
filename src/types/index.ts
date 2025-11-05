@@ -46,6 +46,7 @@ export interface Investment {
   sourceAccountId?: string; // NEW - FK to BankAccount.id (where initial capital came from)
   contributions?: InvestmentContribution[]; // List of additional contributions
   withdrawals?: InvestmentWithdrawal[]; // List of withdrawals
+  deletedAt?: Date;
 }
 
 // Investment Contribution (adding money to investment)
@@ -57,6 +58,7 @@ export interface InvestmentContribution {
   source?: string; // Optional text description
   sourceAccountId?: string; // NEW - FK to BankAccount.id (where contribution came from)
   createdAt: Date;
+  deletedAt?: Date;
 }
 
 // Investment Withdrawal (taking money out of investment)
@@ -68,6 +70,7 @@ export interface InvestmentWithdrawal {
   reason?: string; // Optional text description
   destinationAccountId?: string; // FK to BankAccount.id (where money goes)
   createdAt: Date;
+  deletedAt?: Date;
 }
 
 // Snapshot of investment value at a specific point in time
@@ -79,6 +82,7 @@ export interface InvestmentSnapshot {
   accumulatedReturns: number; // Total returns up to this date
   dailyReturn: number; // Return earned on this specific day
   createdAt: Date;
+  deletedAt?: Date;
 }
 
 export interface Account {

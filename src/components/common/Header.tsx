@@ -30,6 +30,9 @@ export const Header = () => {
           <NavLink to="/accounts" className={navLinkClasses}>
             Cuentas
           </NavLink>
+          <NavLink to="/transfers" className={navLinkClasses}>
+            Transferencias
+          </NavLink>
           <NavLink to="/categories" className={navLinkClasses}>
             Categorías
           </NavLink>

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Expense } from '../../types';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useCategoryStore } from '../../stores/useCategoryStore';
 
 interface CategoryChartProps {
   expenses: Expense[];
@@ -9,21 +10,26 @@ interface CategoryChartProps {
 const COLORS = ['#667eea', '#764ba2', '#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#00C49F', '#FFBB28', '#FF8042'];
 
 export const CategoryChart: React.FC<CategoryChartProps> = ({ expenses }) => {
+  const { categories } = useCategoryStore();
+
   const chartData = useMemo(() => {
     const categoryTotals: { [key: string]: number } = {};
 
     expenses.forEach(expense => {
-      if (!categoryTotals[expense.category]) {
-        categoryTotals[expense.category] = 0;
+      const category = categories.find(c => c.id === expense.category) || categories.find(c => c.name === expense.category);
+      const categoryName = category ? category.name : 'Uncategorized';
+
+      if (!categoryTotals[categoryName]) {
+        categoryTotals[categoryName] = 0;
       }
-      categoryTotals[expense.category] += expense.amount;
+      categoryTotals[categoryName] += expense.amount;
     });
 
-    return Object.keys(categoryTotals).map(category => ({
-      name: category,
-      value: categoryTotals[category],
+    return Object.keys(categoryTotals).map(categoryName => ({
+      name: categoryName,
+      value: categoryTotals[categoryName],
     }));
-  }, [expenses]);
+  }, [expenses, categories]);
 
   if (chartData.length === 0) {
       return <p className='text-center text-gray-500'>No hay datos de gastos para este período.</p>

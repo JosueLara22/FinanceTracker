@@ -4,7 +4,7 @@ emoji: 💰
 colorFrom: blue
 colorTo: indigo
 sdk: static
-sdk_version: ""
+sdk_version: "5.0.8"
 app_file: index.html
 pinned: false
 ---

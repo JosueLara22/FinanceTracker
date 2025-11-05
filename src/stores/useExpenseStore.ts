@@ -1,13 +1,14 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { Expense } from '../types';
-import { db } from '../data/db';
+import { db, dbReady } from '../data/db';
 import {
   createExpense as createExpenseUtil,
   updateExpense as updateExpenseUtil,
   deleteExpense as deleteExpenseUtil,
 } from '../utils/expenseOperations';
 import { useAccountStore } from './useAccountStore';
+import { useTransactionStore } from './useTransactionStore';
 
 interface ExpenseState {
   expenses: Expense[];
@@ -41,6 +42,7 @@ export const useExpenseStore = create<ExpenseState>()(
       loadExpenses: async () => {
         try {
           set({ isLoading: true, error: null });
+          await dbReady;
           // Filter out soft-deleted expenses
           const expenses = await db.expenses
             .filter(e => !e.deletedAt)
@@ -66,13 +68,12 @@ export const useExpenseStore = create<ExpenseState>()(
             isLoading: false,
           }));
 
-          // Reload accounts to reflect balance changes
+          // Recalculate account balance to reflect changes
           if (newExpense.accountId) {
-            console.log('[ExpenseStore] Reloading accounts after expense creation');
-            const accountStore = useAccountStore.getState();
-            await accountStore.loadAccounts();
-            await accountStore.loadCreditCards();
-            console.log('[ExpenseStore] Accounts reloaded');
+            console.log('[ExpenseStore] Recalculating account balance after expense creation');
+            const transactionStore = useTransactionStore.getState();
+            await transactionStore.recalculateAccountBalance(newExpense.accountId);
+            console.log('[ExpenseStore] Account balance recalculated');
           }
         } catch (error) {
           set({
@@ -100,13 +101,16 @@ export const useExpenseStore = create<ExpenseState>()(
             isLoading: false,
           }));
 
-          // Reload accounts to reflect balance changes
-          if (oldExpense?.accountId || updatedExpense.accountId) {
-            console.log('[ExpenseStore] Reloading accounts after expense update');
-            const accountStore = useAccountStore.getState();
-            await accountStore.loadAccounts();
-            await accountStore.loadCreditCards();
-            console.log('[ExpenseStore] Accounts reloaded');
+          // Recalculate account balance(s) to reflect changes
+          if (oldExpense?.accountId) {
+            console.log('[ExpenseStore] Recalculating old account balance after expense update');
+            const transactionStore = useTransactionStore.getState();
+            await transactionStore.recalculateAccountBalance(oldExpense.accountId);
+          }
+          if (updatedExpense.accountId) {
+            console.log('[ExpenseStore] Recalculating new account balance after expense update');
+            const transactionStore = useTransactionStore.getState();
+            await transactionStore.recalculateAccountBalance(updatedExpense.accountId);
           }
         } catch (error) {
           set({
@@ -133,13 +137,12 @@ export const useExpenseStore = create<ExpenseState>()(
             isLoading: false,
           }));
 
-          // Reload accounts to reflect balance changes
+          // Recalculate account balance to reflect changes
           if (expense?.accountId) {
-            console.log('[ExpenseStore] Reloading accounts after expense deletion');
-            const accountStore = useAccountStore.getState();
-            await accountStore.loadAccounts();
-            await accountStore.loadCreditCards();
-            console.log('[ExpenseStore] Accounts reloaded');
+            console.log('[ExpenseStore] Recalculating account balance after expense deletion');
+            const transactionStore = useTransactionStore.getState();
+            await transactionStore.recalculateAccountBalance(expense.accountId);
+            console.log('[ExpenseStore] Account balance recalculated');
           }
         } catch (error) {
           set({

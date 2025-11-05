@@ -7,6 +7,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../data/db';
+import { dbReady } from '../data/db';
 import { Income, Transaction } from '../types';
 import {
   recalculateRunningBalances,
@@ -18,6 +19,7 @@ import {
 // ============================================================================
 
 export async function createIncome(incomeData: Omit<Income, 'id'>): Promise<Income> {
+  await dbReady;
   const income: Income = {
     ...incomeData,
     id: uuidv4(),
@@ -26,7 +28,7 @@ export async function createIncome(incomeData: Omit<Income, 'id'>): Promise<Inco
   };
 
   try {
-    await db.transaction('rw', db.incomes, db.transactions, db.accounts, async () => {
+    await db.transaction('rw', db.incomes, db.transactions, db.accounts, db.creditCards, async () => {
       await db.incomes.add(income);
 
       if (income.accountId) {
@@ -37,11 +39,16 @@ export async function createIncome(incomeData: Omit<Income, 'id'>): Promise<Inco
     return income;
   } catch (error) {
     console.error('Failed to create income:', error);
+    console.error('Error string representation:', String(error));
+    if (typeof error === 'object' && error !== null && 'message' in error) {
+      console.error('Error message property:', (error as any).message);
+    }
     throw new Error('Failed to create income. Please try again.');
   }
 }
 
 async function createTransactionFromIncome(income: Income): Promise<void> {
+  await dbReady;
   if (!income.accountId) return;
 
   const account = await db.accounts.get(income.accountId);
@@ -78,15 +85,16 @@ export async function updateIncome(
   incomeId: string,
   updates: Partial<Income>
 ): Promise<Income> {
+  await dbReady;
   const oldIncome = await db.incomes.get(incomeId);
   if (!oldIncome) throw new Error('Income not found');
 
   const amountChanged = updates.amount !== undefined && updates.amount !== oldIncome.amount;
   const accountChanged = updates.accountId !== undefined && updates.accountId !== oldIncome.accountId;
-  const dateChanged = updates.date !== undefined && updates.date.getTime() !== oldIncome.date.getTime();
+  const dateChanged = updates.date !== undefined && new Date(updates.date).getTime() !== new Date(oldIncome.date).getTime();
 
   try {
-    await db.transaction('rw', db.incomes, db.transactions, db.accounts, async () => {
+    await db.transaction('rw', db.incomes, db.transactions, db.accounts, db.creditCards, async () => {
       const updatedIncome = { ...oldIncome, ...updates, updatedAt: new Date() };
       await db.incomes.update(incomeId, updatedIncome);
 
@@ -120,6 +128,7 @@ export async function updateIncome(
 }
 
 async function updateTransactionForIncome(income: Income): Promise<void> {
+  await dbReady;
   const transaction = await db.transactions
     .where('incomeId')
     .equals(income.id)
@@ -150,11 +159,12 @@ async function updateTransactionForIncome(income: Income): Promise<void> {
 // ============================================================================
 
 export async function deleteIncome(incomeId: string): Promise<void> {
+  await dbReady;
   const income = await db.incomes.get(incomeId);
   if (!income) throw new Error('Income not found');
 
   try {
-    await db.transaction('rw', db.incomes, db.transactions, db.accounts, async () => {
+    await db.transaction('rw', db.incomes, db.transactions, db.accounts, db.creditCards, async () => {
       if (income.accountId) {
         await deleteTransactionForIncome(incomeId);
       }
@@ -175,6 +185,7 @@ export async function deleteIncome(incomeId: string): Promise<void> {
 }
 
 async function deleteTransactionForIncome(incomeId: string): Promise<void> {
+  await dbReady;
   const transaction = await db.transactions
     .where('incomeId')
     .equals(incomeId)

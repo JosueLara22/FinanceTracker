@@ -49,7 +49,7 @@ export const IncomeForm: React.FC<IncomeFormProps> = ({ income, onAddIncome, onC
 
     const now = new Date();
     onAddIncome({
-      date: new Date(date),
+      date: new Date(date.replace(/-/g, '/')),
       amount: parseFloat(amount),
       category,
       description,

@@ -347,6 +347,7 @@ export async function getInvestmentContributions(
   return await db.investmentContributions
     .where('investmentId')
     .equals(investmentId)
+    .filter(c => c.deletedAt == null)
     .sortBy('date');
 }
 
@@ -359,6 +360,7 @@ export async function getInvestmentWithdrawals(
   return await db.investmentWithdrawals
     .where('investmentId')
     .equals(investmentId)
+    .filter(w => w.deletedAt == null)
     .sortBy('date');
 }
 
@@ -383,7 +385,7 @@ export async function getTotalWithdrawals(investmentId: string): Promise<number>
  */
 export async function getTotalInvested(investmentId: string): Promise<number> {
   const investment = await db.investments.get(investmentId);
-  if (!investment) return 0;
+  if (!investment || investment.deletedAt) return 0;
 
   const totalContributions = await getTotalContributions(investmentId);
   const totalWithdrawals = await getTotalWithdrawals(investmentId);

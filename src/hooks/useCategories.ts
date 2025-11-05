@@ -1,5 +1,6 @@
 
 import { useLiveQuery } from 'dexie-react-hooks';
+import { useCallback } from 'react';
 import { db } from '../data/db';
 import { Category } from '../types';
 
@@ -21,15 +22,15 @@ export function useCategories() {
     await db.categories.delete(id);
   };
 
-  const getCategoryById = (id: string) => {
+  const getCategoryById = useCallback((id: string) => {
     return db.categories.get(id);
-  };
+  }, []);
 
-  return { 
-    categories: categories || [], 
-    addCategory, 
-    updateCategory, 
-    deleteCategory, 
-    getCategoryById 
+  return {
+    categories: categories || [],
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    getCategoryById,
   };
 }

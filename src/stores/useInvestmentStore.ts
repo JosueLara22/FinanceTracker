@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { Investment, InvestmentContribution, InvestmentWithdrawal } from '../types';
-import { db } from '../data/db';
+import { Investment, InvestmentContribution, InvestmentWithdrawal, Transaction } from '../types';
+import { db, dbReady } from '../data/db';
 import {
   createInvestmentWithAccountDeduction,
   addContributionWithAccountDeduction,
@@ -10,6 +10,8 @@ import {
   getInvestmentWithdrawals,
   getTotalInvested
 } from '../services/investmentTransactions';
+import { useAccountStore } from './useAccountStore';
+import { useTransactionStore } from './useTransactionStore';
 
 interface InvestmentState {
   investments: Investment[];
@@ -35,7 +37,7 @@ interface InvestmentState {
     reason?: string
   ) => Promise<{ success: boolean; error?: string }>;
   updateInvestment: (id: string, updates: Partial<Investment>) => Promise<void>;
-  deleteInvestment: (id: string) => Promise<void>;
+  deleteInvestment: (id: string, destinationAccountId?: string) => Promise<void>;
   getInvestmentById: (id: string) => Investment | undefined;
   getContributions: (investmentId: string) => Promise<InvestmentContribution[]>;
   getWithdrawals: (investmentId: string) => Promise<InvestmentWithdrawal[]>;
@@ -65,7 +67,8 @@ export const useInvestmentStore = create<InvestmentState>()(
       loadInvestments: async () => {
         try {
           set({ isLoading: true, error: null });
-          const investments = await db.investments.toArray();
+          await dbReady;
+          const investments = await db.investments.filter(i => !i.deletedAt).toArray();
           set({ investments, isLoading: false });
         } catch (error) {
           set({
@@ -75,8 +78,17 @@ export const useInvestmentStore = create<InvestmentState>()(
         }
       },
 
-      addInvestment: async (investmentData, sourceAccountId) => {
-        try {
+            addInvestment: async (
+
+              investmentData,
+
+              sourceAccountId
+
+            ) => {
+
+              await dbReady;
+
+              try {
           set({ isLoading: true, error: null });
 
           const result = await createInvestmentWithAccountDeduction(
@@ -103,6 +115,7 @@ export const useInvestmentStore = create<InvestmentState>()(
       },
 
       addContribution: async (investmentId, amount, sourceAccountId, source) => {
+        await dbReady;
         try {
           set({ isLoading: true, error: null });
 
@@ -140,6 +153,7 @@ export const useInvestmentStore = create<InvestmentState>()(
       },
 
       addWithdrawal: async (investmentId, amount, destinationAccountId, reason) => {
+        await dbReady;
         try {
           set({ isLoading: true, error: null });
 
@@ -177,18 +191,22 @@ export const useInvestmentStore = create<InvestmentState>()(
       },
 
       getContributions: async (investmentId) => {
+        await dbReady;
         return await getInvestmentContributions(investmentId);
       },
 
       getWithdrawals: async (investmentId) => {
+        await dbReady;
         return await getInvestmentWithdrawals(investmentId);
       },
 
       getTotalInvestedAmount: async (investmentId) => {
+        await dbReady;
         return await getTotalInvested(investmentId);
       },
 
       updateInvestment: async (id, updates) => {
+        await dbReady;
         try {
           set({ isLoading: true, error: null });
 
@@ -209,14 +227,49 @@ export const useInvestmentStore = create<InvestmentState>()(
         }
       },
 
-      deleteInvestment: async (id) => {
+      deleteInvestment: async (id, destinationAccountId) => {
+        await dbReady;
         try {
           set({ isLoading: true, error: null });
 
-          await db.investments.delete(id);
+          const investmentToDelete = get().investments.find(inv => inv.id === id);
+          if (!investmentToDelete) {
+            throw new Error('Investment not found');
+          }
+
+          const now = new Date();
+          await db.investments.update(id, { deletedAt: now });
+          await db.investmentSnapshots.where({ investmentId: id }).modify({ deletedAt: now });
+          await db.investmentContributions.where({ investmentId: id }).modify({ deletedAt: now });
+          await db.investmentWithdrawals.where({ investmentId: id }).modify({ deletedAt: now });
+
+          // Optional: Handle fund transfer
+          if (destinationAccountId && investmentToDelete.currentValue > 0) {
+            const transactionStore = useTransactionStore.getState();
+            const accountStore = useAccountStore.getState();
+
+            const destinationAccount = accountStore.getAccountById(destinationAccountId);
+            if (!destinationAccount) {
+              console.warn(`Destination account ${destinationAccountId} not found for transfer.`);
+            } else {
+              const transferTransaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'> = {
+                accountId: destinationAccountId,
+                accountType: 'bank',
+                date: now,
+                amount: investmentToDelete.currentValue,
+                type: 'deposit',
+                description: `Transfer from deleted investment: ${investmentToDelete.platform} - ${investmentToDelete.type}`,
+                balance: destinationAccount.balance + investmentToDelete.currentValue, // This will be recalculated by recalculateAccountBalance
+                pending: false,
+              };
+              await transactionStore.addTransaction(transferTransaction);
+            }
+          }
 
           set((state) => ({
-            investments: state.investments.filter((investment) => investment.id !== id),
+            investments: state.investments.map((investment) =>
+              investment.id === id ? { ...investment, deletedAt: now } : investment
+            ),
             isLoading: false,
           }));
         } catch (error) {
@@ -229,7 +282,7 @@ export const useInvestmentStore = create<InvestmentState>()(
       },
 
       getInvestmentById: (id) => {
-        return get().investments.find((investment) => investment.id === id);
+        return get().investments.find((investment) => investment.id === id && !investment.deletedAt);
       },
 
       // Calculate daily return using compound interest formula

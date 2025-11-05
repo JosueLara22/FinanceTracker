@@ -7,6 +7,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../data/db';
+import { dbReady } from '../data/db';
 import { Expense, Transaction } from '../types';
 import {
   recalculateRunningBalances,
@@ -18,6 +19,7 @@ import {
 // ============================================================================
 
 export async function createExpense(expenseData: Omit<Expense, 'id'>): Promise<Expense> {
+  await dbReady;
   const expense: Expense = {
     ...expenseData,
     id: uuidv4(),
@@ -52,6 +54,7 @@ export async function createExpense(expenseData: Omit<Expense, 'id'>): Promise<E
 }
 
 async function createTransactionFromExpense(expense: Expense): Promise<void> {
+  await dbReady;
   if (!expense.accountId) return;
 
   const isCredit = expense.paymentMethod === 'credit';
@@ -116,6 +119,7 @@ export async function updateExpense(
   expenseId: string,
   updates: Partial<Expense>
 ): Promise<Expense> {
+  await dbReady;
   const oldExpense = await db.expenses.get(expenseId);
   if (!oldExpense) throw new Error('Expense not found');
 
@@ -170,6 +174,7 @@ export async function updateExpense(
 }
 
 async function updateTransactionForExpense(expense: Expense): Promise<void> {
+  await dbReady;
   const transaction = await db.transactions
     .where('expenseId')
     .equals(expense.id)
@@ -209,6 +214,7 @@ async function updateTransactionForExpense(expense: Expense): Promise<void> {
 // ============================================================================
 
 export async function deleteExpense(expenseId: string): Promise<void> {
+  await dbReady;
   const expense = await db.expenses.get(expenseId);
   if (!expense) throw new Error('Expense not found');
 
@@ -237,6 +243,7 @@ export async function deleteExpense(expenseId: string): Promise<void> {
 }
 
 async function deleteTransactionForExpense(expenseId: string): Promise<void> {
+  await dbReady;
   const transaction = await db.transactions
     .where('expenseId')
     .equals(expenseId)

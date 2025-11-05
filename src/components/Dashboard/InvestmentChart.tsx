@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Investment } from '../../types';
 import { investmentUpdateService } from '../../services/investmentUpdateService';
+import { useTheme } from '../../hooks/useTheme';
 
 interface InvestmentChartProps {
   investments: Investment[];
@@ -16,6 +17,7 @@ const platformColors: { [key: string]: string } = {
 };
 
 export const InvestmentChart: React.FC<InvestmentChartProps> = ({ investments }) => {
+  const { theme } = useTheme();
   const [chartData, setChartData] = useState<{ date: string; [platform: string]: number | string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -110,6 +112,8 @@ export const InvestmentChart: React.FC<InvestmentChartProps> = ({ investments })
   }
 
   const platforms = [...new Set(investments.map(inv => inv.platform))];
+  const tooltipContentStyle = theme === 'dark' ? { backgroundColor: '#212529', border: 'none' } : {};
+  const tooltipLabelStyle = theme === 'dark' ? { color: '#fff' } : {};
 
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -123,7 +127,12 @@ export const InvestmentChart: React.FC<InvestmentChartProps> = ({ investments })
           height={60}
         />
         <YAxis tick={{ fontSize: 12 }} />
-        <Tooltip formatter={(value: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value)} />
+        <Tooltip 
+          formatter={(value: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value)}
+          contentStyle={tooltipContentStyle}
+          labelStyle={tooltipLabelStyle}
+          itemStyle={tooltipLabelStyle}
+        />
         <Legend />
         {platforms.map(platform => (
           <Area

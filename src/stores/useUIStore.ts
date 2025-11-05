@@ -44,6 +44,11 @@ interface UIState {
   filters: Filters;
   sidebarCollapsed: boolean;
   lastSync?: Date;
+  toast: {
+    message: string;
+    type: 'success' | 'error' | 'info' | '';
+    isVisible: boolean;
+  };
 
   // Actions
   setLoading: (loading: boolean) => void;
@@ -58,6 +63,8 @@ interface UIState {
   setSidebarCollapsed: (collapsed: boolean) => void;
   setLastSync: (date: Date) => void;
   resetFilters: () => void;
+  showToast: (message: string, type: 'success' | 'error' | 'info') => void;
+  hideToast: () => void;
 
   // Utility
   getCurrentMonthPeriod: () => string;
@@ -93,6 +100,11 @@ export const useUIStore = create<UIState>()(
         },
         sidebarCollapsed: false,
         lastSync: undefined,
+        toast: {
+          message: '',
+          type: '',
+          isVisible: false,
+        },
 
         setLoading: (loading) => set({ isLoading: loading }),
 
@@ -149,6 +161,15 @@ export const useUIStore = create<UIState>()(
               accounts: {},
             },
           }),
+
+        showToast: (message, type) => {
+          set({ toast: { message, type, isVisible: true } });
+          setTimeout(() => get().hideToast(), 3000); // Hide after 3 seconds
+        },
+
+        hideToast: () => {
+          set({ toast: { message: '', type: '', isVisible: false } });
+        },
 
         getCurrentMonthPeriod: () => getCurrentMonth(),
 

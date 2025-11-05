@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { Transaction } from '../types';
-import { db } from '../data/db';
+import { db, dbReady } from '../data/db';
 import { useAccountStore } from './useAccountStore';
 
 interface TransactionState {
@@ -92,6 +92,7 @@ export const useTransactionStore = create<TransactionState>()(
 
       // Update a transaction
       updateTransaction: async (id, updates) => {
+        await dbReady;
         try {
           set({ isLoading: true, error: null });
 
@@ -127,6 +128,7 @@ export const useTransactionStore = create<TransactionState>()(
 
       // Delete a transaction
       deleteTransaction: async (id) => {
+        await dbReady;
         try {
           set({ isLoading: true, error: null });
 
@@ -192,9 +194,15 @@ export const useTransactionStore = create<TransactionState>()(
       },
 
       recalculateAccountBalance: async (accountId: string) => {
+        await dbReady;
         const accountStore = useAccountStore.getState();
-        const allTransactions = get().transactions;
-        const accountTransactions = allTransactions.filter(t => t.accountId === accountId);
+
+        // Fetch transactions directly from the database for the specific account
+        const accountTransactions = await db.transactions
+          .where('accountId')
+          .equals(accountId)
+          .filter(t => !t.deletedAt) // Only consider non-deleted transactions
+          .toArray();
 
         const newBalance = accountTransactions.reduce((sum, t) => sum + t.amount, 0);
 

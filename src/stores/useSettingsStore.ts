@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { UserSettings, Category, BankAccount } from '../types';
-import { db } from '../data/db';
+import { db, dbReady } from '../data/db';
 import { initialUserSettings, defaultCategories as defaultCategoriesBase, defaultAccounts as defaultAccountsBase } from '../data/defaults';
 
 // Add IDs to default categories
@@ -59,6 +59,7 @@ export const useSettingsStore = create<SettingsState>()(
       loadUserSettings: async () => {
         try {
           set({ isLoading: true, error: null });
+          await dbReady;
           const settings = await db.userSettings.toArray();
 
           if (settings.length > 0) {
@@ -77,6 +78,7 @@ export const useSettingsStore = create<SettingsState>()(
       },
 
       updateUserSettings: async (updates) => {
+        await dbReady;
         try {
           set({ isLoading: true, error: null });
           const currentSettings = get().userSettings;
@@ -96,6 +98,7 @@ export const useSettingsStore = create<SettingsState>()(
       },
 
       resetUserSettings: async () => {
+        await dbReady;
         try {
           set({ isLoading: true, error: null });
 
@@ -115,6 +118,7 @@ export const useSettingsStore = create<SettingsState>()(
       loadCategories: async () => {
         try {
           set({ isLoading: true, error: null });
+          await dbReady;
           const categories = await db.categories.toArray();
 
           if (categories.length > 0) {
@@ -133,6 +137,7 @@ export const useSettingsStore = create<SettingsState>()(
       },
 
       addCategory: async (categoryData) => {
+        await dbReady;
         try {
           set({ isLoading: true, error: null });
 
@@ -157,6 +162,7 @@ export const useSettingsStore = create<SettingsState>()(
       },
 
       updateCategory: async (id, updates) => {
+        await dbReady;
         try {
           set({ isLoading: true, error: null });
 
@@ -178,6 +184,7 @@ export const useSettingsStore = create<SettingsState>()(
       },
 
       deleteCategory: async (id) => {
+        await dbReady;
         try {
           set({ isLoading: true, error: null });
 
@@ -205,6 +212,7 @@ export const useSettingsStore = create<SettingsState>()(
       },
 
       initializeDefaults: async () => {
+        await dbReady;
         try {
           set({ isLoading: true, error: null });
 

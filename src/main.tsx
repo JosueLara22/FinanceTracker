@@ -5,12 +5,20 @@ import './index.css'
 import { AppProvider } from './contexts/AppContext.tsx';
 import { ThemeProvider } from './contexts/ThemeContext.tsx';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <ThemeProvider>
-      <AppProvider>
-        <App />
-      </AppProvider>
-    </ThemeProvider>
-  </React.StrictMode>,
-)
+import { dbReady } from './data/db';
+
+async function initApp() {
+  await dbReady;
+
+  ReactDOM.createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
+      <ThemeProvider>
+        <AppProvider>
+          <App />
+        </AppProvider>
+      </ThemeProvider>
+    </React.StrictMode>,
+  );
+}
+
+initApp();

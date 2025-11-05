@@ -11,7 +11,7 @@ import { AccountDetail } from './components/Accounts/AccountDetail';
 import { Header } from './components/common/Header';
 import { Categories } from './components/Categories';
 import { Transfers } from './components/Transfers';
-// import { DataBackup } from './components/DataBackup';
+import { DataBackup } from './components/DataBackup';
 import {
   initializeStores,
   useExpenseStore,
@@ -108,7 +108,7 @@ function App() {
         )}
 
         {/* Data Backup Utility */}
-        {/* <DataBackup /> */}
+        <DataBackup />
       </main>
     </Router>
   );

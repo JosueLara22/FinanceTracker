@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { Income } from '../types';
-import { db } from '../data/db';
+import { db, dbReady } from '../data/db';
 import {
   createIncome as createIncomeUtil,
   updateIncome as updateIncomeUtil,
@@ -41,6 +41,7 @@ export const useIncomeStore = create<IncomeState>()(
       loadIncomes: async () => {
         try {
           set({ isLoading: true, error: null });
+          await dbReady;
           // Filter out soft-deleted incomes
           const incomes = await db.incomes
             .filter(i => !i.deletedAt)
@@ -66,10 +67,12 @@ export const useIncomeStore = create<IncomeState>()(
             isLoading: false,
           }));
 
-          // Reload accounts to reflect balance changes
+          // Recalculate account balance to reflect changes
           if (newIncome.accountId) {
-            const accountStore = useAccountStore.getState();
-            await accountStore.loadAccounts();
+            console.log('[IncomeStore] Recalculating account balance after income creation');
+            const transactionStore = useTransactionStore.getState();
+            await transactionStore.recalculateAccountBalance(newIncome.accountId);
+            console.log('[IncomeStore] Account balance recalculated');
           }
         } catch (error) {
           set({
@@ -97,10 +100,16 @@ export const useIncomeStore = create<IncomeState>()(
             isLoading: false,
           }));
 
-          // Reload accounts to reflect balance changes
-          if (oldIncome?.accountId || updatedIncome.accountId) {
-            const accountStore = useAccountStore.getState();
-            await accountStore.loadAccounts();
+          // Recalculate account balance(s) to reflect changes
+          if (oldIncome?.accountId) {
+            console.log('[IncomeStore] Recalculating old account balance after income update');
+            const transactionStore = useTransactionStore.getState();
+            await transactionStore.recalculateAccountBalance(oldIncome.accountId);
+          }
+          if (updatedIncome.accountId) {
+            console.log('[IncomeStore] Recalculating new account balance after income update');
+            const transactionStore = useTransactionStore.getState();
+            await transactionStore.recalculateAccountBalance(updatedIncome.accountId);
           }
         } catch (error) {
           set({
@@ -127,10 +136,12 @@ export const useIncomeStore = create<IncomeState>()(
             isLoading: false,
           }));
 
-          // Reload accounts to reflect balance changes
+          // Recalculate account balance to reflect changes
           if (income?.accountId) {
-            const accountStore = useAccountStore.getState();
-            await accountStore.loadAccounts();
+            console.log('[IncomeStore] Recalculating account balance after income deletion');
+            const transactionStore = useTransactionStore.getState();
+            await transactionStore.recalculateAccountBalance(income.accountId);
+            console.log('[IncomeStore] Account balance recalculated');
           }
         } catch (error) {
           set({

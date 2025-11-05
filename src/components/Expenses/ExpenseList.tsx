@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Expense } from '../../types';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { useAccountStore } from '../../stores/useAccountStore';
+import { useCategoryStore } from '../../stores/useCategoryStore';
 
 interface ExpenseListProps {
   expenses: Expense[];
@@ -15,22 +16,22 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
   onEditExpense
 }) => {
   const { accounts, creditCards, loadAccounts, loadCreditCards } = useAccountStore();
+  const { categories, loadCategories } = useCategoryStore();
 
   useEffect(() => {
     loadAccounts();
     loadCreditCards();
-  }, [loadAccounts, loadCreditCards]);
+    loadCategories();
+  }, [loadAccounts, loadCreditCards, loadCategories]);
 
   const getAccountName = (expense: Expense): string | null => {
     if (!expense.accountId) return null;
 
-    // Check if it's a credit card (when payment method is credit)
     if (expense.paymentMethod === 'credit') {
       const card = creditCards.find(c => c.id === expense.accountId);
       return card ? `${card.cardName} (${card.bank})` : null;
     }
 
-    // Otherwise, it's a bank/cash account
     const account = accounts.find(a => a.id === expense.accountId);
     if (!account) return null;
 
@@ -40,6 +41,12 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
       return `${account.name} (${account.bankName})`;
     }
   };
+
+  const getCategoryName = (categoryId: string): string => {
+    const category = categories.find(c => c.id === categoryId);
+    return category ? category.name : categoryId;
+  };
+
   if (expenses.length === 0) {
     return (
       <div className="text-center py-12">
@@ -69,7 +76,7 @@ export const ExpenseList: React.FC<ExpenseListProps> = ({
                   </p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-primary-light dark:bg-primary-dark text-primary-dark dark:text-white">
-                      {expense.category}
+                      {getCategoryName(expense.category)}
                     </span>
                     {expense.subcategory && (
                       <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">

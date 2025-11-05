@@ -1,6 +1,8 @@
 
 import React, { useMemo } from 'react';
-import { useExpenses } from '../../hooks/useExpenses';
+
+import { useFilteredExpenses } from '../../hooks/useFilteredExpenses';
+import { useCategoryFilteredExpenses } from '../../hooks/useCategoryFilteredExpenses';
 import { useInvestments } from '../../hooks/useInvestments';
 import { useIncomes } from '../../hooks/useIncomes';
 import { useAccounts } from '../../hooks/useAccounts';
@@ -33,7 +35,8 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ onAddExpenseClick, onAddIncomeClick }) => {
-    const { expenses } = useExpenses();
+    const { filteredExpenses: fullyFilteredExpenses } = useFilteredExpenses();
+    const { filteredExpenses: categoryFilteredExpenses } = useCategoryFilteredExpenses();
     const { investments } = useInvestments();
     const { accounts } = useAccounts();
     const { creditCards } = useCreditCards();
@@ -74,7 +77,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onAddExpenseClick, onAddIn
       /**
        * Monthly Expenses: The sum of all expenses recorded in the current calendar month.
        */
-      const monthlyExpenses = expenses
+      const monthlyExpenses = fullyFilteredExpenses
         .filter((exp) => new Date(exp.date).getMonth() === new Date().getMonth())
         .reduce((sum, exp) => sum + exp.amount, 0);
   
@@ -96,7 +99,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onAddExpenseClick, onAddIn
         monthlyExpenses,
         monthlyCashFlow,
       };
-    }, [expenses, investments, accounts, creditCards, incomes]);
+    }, [fullyFilteredExpenses, investments, accounts, creditCards, incomes]);
 
   return (
     <div className="p-4">
@@ -141,10 +144,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onAddExpenseClick, onAddIn
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                <ExpenseChart expenses={expenses} />
+                <ExpenseChart expenses={categoryFilteredExpenses} />
             </div>
             <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                <CategoryChart expenses={expenses} />
+                <CategoryChart expenses={fullyFilteredExpenses} />
             </div>
         </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Expense } from '../../types';
 import { useCategories } from '../../hooks/useCategories';
 import { useAccountStore } from '../../stores/useAccountStore';
@@ -22,14 +22,25 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
   const [tagInput, setTagInput] = useState('');
   const [recurring, setRecurring] = useState(false);
 
-  const { categories } = useCategories();
+  const { categories, getCategoryById } = useCategories();
   const { accounts, creditCards, loadAccounts, loadCreditCards } = useAccountStore();
   const expenseCategories = categories.filter(c => c.type === 'expense');
 
-  const cashAccounts = accounts.filter(a => a.type === 'cash' && a.isActive);
-  const bankAccounts = accounts.filter(a => a.type === 'bank' && a.isActive);
-
-  const selectedCategory = expenseCategories.find(c => c.name === category);
+  const selectedCategory = categories.find(c => c.id === category);
+  const cashAccounts = useMemo(
+    () =>
+      accounts.filter(
+        (acc) => acc.name.toLowerCase() === 'efectivo' || acc.name.toLowerCase() === 'cash'
+      ),
+    [accounts]
+  );
+  const bankAccounts = useMemo(
+    () =>
+      accounts.filter(
+        (acc) => acc.accountType === 'checking' || acc.accountType === 'savings'
+      ),
+    [accounts]
+  );
 
   useEffect(() => {
     loadAccounts();
@@ -49,18 +60,22 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
   }, [paymentMethod, cashAccounts]);
 
   useEffect(() => {
-    if (expense) {
-      setDescription(expense.description);
-      setAmount(expense.amount.toString());
-      setDate(formatDateForInput(expense.date));
-      setCategory(expense.category);
-      setSubcategory(expense.subcategory || '');
-      setPaymentMethod(expense.paymentMethod);
-      setAccountId(expense.accountId || '');
-      setTags(expense.tags || []);
-      setRecurring(expense.recurring || false);
-    }
-  }, [expense, accounts, creditCards]);
+    const fetchCategory = async () => {
+      if (expense) {
+        setDescription(expense.description);
+        setAmount(expense.amount.toString());
+        setDate(formatDateForInput(expense.date));
+        const category = await getCategoryById(expense.category);
+        setCategory(category ? category.id : '');
+        setSubcategory(expense.subcategory || '');
+        setPaymentMethod(expense.paymentMethod);
+        setAccountId(expense.accountId || '');
+        setTags(expense.tags || []);
+        setRecurring(expense.recurring || false);
+      }
+    };
+    fetchCategory();
+  }, [expense, getCategoryById]);
 
   useEffect(() => {
     if (expense && paymentMethod === 'credit' && creditCards.length > 0) {
@@ -109,7 +124,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onAddExpense,
 
     const now = new Date();
     onAddExpense({
-      date: new Date(`${date}T00:00:00`),
+      date: new Date(date.replace(/-/g, '/')),
       amount: parseFloat(amount),
       category,
       subcategory: subcategory || undefined,

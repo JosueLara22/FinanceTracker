@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Expense } from '../../types';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useTheme } from '../../hooks/useTheme';
 
 interface ExpenseChartProps {
   expenses: Expense[];
@@ -14,6 +15,7 @@ const formatCurrencyForAxis = (tickItem: number) => {
 }
 
 export const ExpenseChart: React.FC<ExpenseChartProps> = ({ expenses }) => {
+  const { theme } = useTheme();
   const chartData = useMemo(() => {
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
@@ -44,13 +46,21 @@ export const ExpenseChart: React.FC<ExpenseChartProps> = ({ expenses }) => {
     }));
   }, [expenses]);
 
+  const tooltipContentStyle = theme === 'dark' ? { backgroundColor: '#212529', border: 'none' } : {};
+  const tooltipLabelStyle = theme === 'dark' ? { color: '#fff' } : {};
+
   return (
     <ResponsiveContainer width="100%" height={300}>
       <LineChart data={chartData}>
         <CartesianGrid strokeDasharray="3 3" vertical={false} />
         <XAxis dataKey="month" tick={{ fontSize: 12 }} />
         <YAxis tickFormatter={formatCurrencyForAxis} tick={{ fontSize: 12 }} />
-        <Tooltip formatter={(value: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value)} />
+        <Tooltip 
+          formatter={(value: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value)}
+          contentStyle={tooltipContentStyle}
+          labelStyle={tooltipLabelStyle}
+          itemStyle={tooltipLabelStyle}
+        />
         <Legend />
         <Line type="monotone" dataKey="amount" name="Gastos Totales" stroke="#8884d8" strokeWidth={2} activeDot={{ r: 8 }} />
       </LineChart>

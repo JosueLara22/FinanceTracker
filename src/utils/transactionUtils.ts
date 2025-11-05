@@ -10,6 +10,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../data/db';
+import { dbReady } from '../data/db';
 import { Transaction } from '../types';
 
 // ============================================================================
@@ -25,6 +26,7 @@ import { Transaction } from '../types';
  * and validation purposes only.
  */
 export async function recalculateAccountBalance(accountId: string): Promise<number> {
+  await dbReady;
   const transactions = await db.transactions
     .where('accountId')
     .equals(accountId)
@@ -72,6 +74,7 @@ export async function validateAccountBalance(accountId: string): Promise<{
   actualBalance: number;
   difference: number;
 }> {
+  await dbReady;
   // Get current cached balance
   const account = await db.accounts.get(accountId);
   const creditCard = await db.creditCards.get(accountId);
@@ -112,6 +115,7 @@ export async function validateAccountBalance(accountId: string): Promise<{
  * updated separately by the calling code to maintain the opening balance.
  */
 export async function recalculateRunningBalances(accountId: string): Promise<void> {
+  await dbReady;
   // Get the current account balance (including opening balance)
   const account = await db.accounts.get(accountId);
   const creditCard = await db.creditCards.get(accountId);
@@ -167,6 +171,7 @@ export async function recalculateRunningBalances(accountId: string): Promise<voi
  * Get account name for display purposes
  */
 export async function getAccountName(accountId: string, accountType: 'bank' | 'credit'): Promise<string> {
+  await dbReady;
   if (accountType === 'bank') {
     const account = await db.accounts.get(accountId);
     if (!account) return 'Unknown Account';
@@ -187,6 +192,7 @@ export async function updateAccountBalanceForTransaction(
   accountType: 'bank' | 'credit',
   amountChange: number
 ): Promise<void> {
+  await dbReady;
   if (accountType === 'bank') {
     const account = await db.accounts.get(accountId);
     if (!account) throw new Error('Account not found');
@@ -220,6 +226,7 @@ export async function updateAccountBalanceForTransaction(
  * Find transactions that reference deleted or non-existent expenses/incomes/transfers
  */
 export async function findOrphanedTransactions(): Promise<Transaction[]> {
+  await dbReady;
   const allTransactions = await db.transactions.toArray();
   const orphaned: Transaction[] = [];
 
@@ -252,6 +259,7 @@ export async function findOrphanedTransactions(): Promise<Transaction[]> {
  * Find transfers missing one or both transactions
  */
 export async function findIncompleteTransfers(): Promise<import('../types').Transfer[]> {
+  await dbReady;
   const allTransfers = await db.transfers.filter(t => !t.deletedAt).toArray();
   const incomplete: import('../types').Transfer[] = [];
 
@@ -272,6 +280,7 @@ export async function findIncompleteTransfers(): Promise<import('../types').Tran
  * (same accountId, date, and amount)
  */
 export async function findDuplicateTransactions(): Promise<Array<Transaction[]>> {
+  await dbReady;
   const transactions = await db.transactions
     .filter(t => !t.deletedAt)
     .toArray();
@@ -279,7 +288,7 @@ export async function findDuplicateTransactions(): Promise<Array<Transaction[]>>
   const groups = new Map<string, Transaction[]>();
 
   for (const transaction of transactions) {
-    const key = `${transaction.accountId}-${transaction.date.getTime()}-${transaction.amount}`;
+    const key = `${transaction.accountId}-${new Date(transaction.date).getTime()}-${transaction.amount}`;
     const group = groups.get(key) || [];
     group.push(transaction);
     groups.set(key, group);
@@ -315,6 +324,7 @@ export interface ValidationReport {
  * Run comprehensive validation checks on startup
  */
 export async function runStartupValidations(): Promise<ValidationReport> {
+  await dbReady;
   console.log('Starting validation checks...');
 
   const issues: ValidationIssue[] = [];
@@ -409,6 +419,7 @@ export interface FixReport {
  * Automatically fix balance discrepancies
  */
 export async function autoFixBalanceDiscrepancies(): Promise<FixReport> {
+  await dbReady;
   const fixed: string[] = [];
   const failed: string[] = [];
   let checked = 0;
@@ -463,6 +474,7 @@ export async function autoFixBalanceDiscrepancies(): Promise<FixReport> {
  * Clean up orphaned transactions
  */
 export async function cleanupOrphanedTransactions(): Promise<number> {
+  await dbReady;
   const orphaned = await findOrphanedTransactions();
   let deletedCount = 0;
 
@@ -504,6 +516,7 @@ export async function reconcileAllAccounts(): Promise<{
   balancesFixed: number;
   errors: Array<{ accountId: string; error: string }>;
 }> {
+  await dbReady;
   const summary = {
     startTime: new Date(),
     endTime: new Date(),
@@ -570,6 +583,7 @@ export async function createBalanceAdjustment(
   accountId: string,
   newBalance: number
 ): Promise<void> {
+  await dbReady;
   try {
     // Get current account and determine type
     const account = await db.accounts.get(accountId);

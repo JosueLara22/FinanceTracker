@@ -8,6 +8,7 @@ import {
   deleteTransfer as deleteTransferUtil,
 } from '../utils/transferOperations';
 import { useAccountStore } from './useAccountStore';
+import { useTransactionStore } from './useTransactionStore';
 
 interface TransferState {
   transfers: Transfer[];
@@ -79,10 +80,12 @@ export const useTransferStore = create<TransferState>()(
             isLoading: false,
           }));
 
-          // Reload accounts to reflect balance changes in both accounts
-          const accountStore = useAccountStore.getState();
-          await accountStore.loadAccounts();
-          await accountStore.loadCreditCards();
+          // Recalculate account balances to reflect changes in both accounts
+          console.log('[TransferStore] Recalculating account balances after transfer creation');
+          const transactionStore = useTransactionStore.getState();
+          await transactionStore.recalculateAccountBalance(newTransfer.fromAccountId);
+          await transactionStore.recalculateAccountBalance(newTransfer.toAccountId);
+          console.log('[TransferStore] Account balances recalculated');
 
           return newTransfer;
         } catch (error) {
@@ -109,10 +112,12 @@ export const useTransferStore = create<TransferState>()(
             isLoading: false,
           }));
 
-          // Reload accounts to reflect balance changes
-          const accountStore = useAccountStore.getState();
-          await accountStore.loadAccounts();
-          await accountStore.loadCreditCards();
+          // Recalculate account balances to reflect changes in both accounts
+          console.log('[TransferStore] Recalculating account balances after transfer update');
+          const transactionStore = useTransactionStore.getState();
+          await transactionStore.recalculateAccountBalance(updatedTransfer.fromAccountId);
+          await transactionStore.recalculateAccountBalance(updatedTransfer.toAccountId);
+          console.log('[TransferStore] Account balances recalculated');
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Failed to update transfer',
@@ -136,10 +141,16 @@ export const useTransferStore = create<TransferState>()(
             isLoading: false,
           }));
 
-          // Reload accounts to reflect balance changes
-          const accountStore = useAccountStore.getState();
-          await accountStore.loadAccounts();
-          await accountStore.loadCreditCards();
+          // Recalculate account balances to reflect changes in both accounts
+          console.log('[TransferStore] Recalculating account balances after transfer deletion');
+          const transactionStore = useTransactionStore.getState();
+          // We need the original transfer to get the account IDs
+          const originalTransfer = get().transfers.find(t => t.id === id);
+          if (originalTransfer) {
+            await transactionStore.recalculateAccountBalance(originalTransfer.fromAccountId);
+            await transactionStore.recalculateAccountBalance(originalTransfer.toAccountId);
+          }
+          console.log('[TransferStore] Account balances recalculated');
         } catch (error) {
           set({
             error: error instanceof Error ? error.message : 'Failed to delete transfer',

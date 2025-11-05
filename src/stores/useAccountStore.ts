@@ -2,8 +2,10 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { BankAccount, CreditCard, Budget, SavingsGoal } from '../types';
-import { db } from '../data/db';
+import { db, dbReady } from '../data/db';
 import { useTransactionStore } from './useTransactionStore';
+
+
 
 interface AccountState {
   // Bank Accounts
@@ -77,6 +79,7 @@ export const useAccountStore = create<AccountState>()(
       loadAccounts: async () => {
         try {
           set({ isLoading: true, error: null });
+          await dbReady;
           // Filter out soft-deleted accounts
           const accounts = await db.accounts
             .filter(a => !a.deletedAt)
@@ -153,6 +156,7 @@ export const useAccountStore = create<AccountState>()(
       loadCreditCards: async () => {
         try {
           set({ isLoading: true, error: null });
+          await dbReady;
           // Filter out soft-deleted credit cards
           const creditCards = await db.creditCards
             .filter(c => !c.deletedAt)
