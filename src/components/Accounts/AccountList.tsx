@@ -23,7 +23,7 @@ export const AccountList: React.FC<AccountListProps> = ({ accounts, onEditAccoun
       await loadAccounts();
     } catch (error) {
       console.error('[AccountList] Failed to update balance:', error);
-      alert('Failed to update balance. Please try again.');
+      alert('No se pudo actualizar el saldo. Por favor, inténtalo de nuevo.');
     }
   };
 
@@ -31,8 +31,8 @@ export const AccountList: React.FC<AccountListProps> = ({ accounts, onEditAccoun
     return (
       <div className="text-center py-12">
         <Wallet className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-        <p className="text-gray-500 dark:text-gray-400">No bank accounts added yet.</p>
-        <p className="text-sm text-gray-400 dark:text-gray-500">Add your first account to start tracking!</p>
+        <p className="text-gray-500 dark:text-gray-400">Aún no se han agregado cuentas bancarias.</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500">¡Agrega tu primera cuenta para comenzar a rastrear!</p>
       </div>
     );
   }
@@ -50,7 +50,7 @@ export const AccountList: React.FC<AccountListProps> = ({ accounts, onEditAccoun
           <div className="flex items-start justify-between mb-4">
             {!account.isActive && (
               <span className="px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-200 rounded-full">
-                Inactive
+                Inactiva
               </span>
             )}
           </div>
@@ -63,7 +63,7 @@ export const AccountList: React.FC<AccountListProps> = ({ accounts, onEditAccoun
               <p className="text-sm text-gray-500 dark:text-gray-400">{account.bankName}</p>
             )}
             <div className="flex items-center justify-between mb-1">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Current Balance</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Saldo Actual</p>
               <QuickBalanceUpdate
                 account={account}
                 onUpdate={handleQuickBalanceUpdate}
@@ -78,7 +78,7 @@ export const AccountList: React.FC<AccountListProps> = ({ accounts, onEditAccoun
           </div>
 
           <div className="text-xs text-gray-400 dark:text-gray-500 mb-4">
-            Last updated: {new Date(account.lastUpdate).toLocaleDateString()}
+            Última actualización: {new Date(account.lastUpdate).toLocaleDateString()}
           </div>
 
           <div className="flex space-x-2 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -86,13 +86,13 @@ export const AccountList: React.FC<AccountListProps> = ({ accounts, onEditAccoun
               onClick={() => onEditAccount(account)}
               className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-DEFAULT"
               data-testid={`edit-account-${account.id}`}>
-              Edit
+              Editar
             </button>
             <button
               onClick={() => onDeleteAccount(account.id)}
               className="flex-1 px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               data-testid={`delete-account-${account.id}`}>
-              Delete
+              Eliminar
             </button>
           </div>
         </div>

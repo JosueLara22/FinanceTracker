@@ -7,7 +7,7 @@ import {
   updateExpense as updateExpenseUtil,
   deleteExpense as deleteExpenseUtil,
 } from '../utils/expenseOperations';
-import { useAccountStore } from './useAccountStore';
+
 import { useTransactionStore } from './useTransactionStore';
 
 interface ExpenseState {

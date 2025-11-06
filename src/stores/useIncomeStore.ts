@@ -7,7 +7,7 @@ import {
   updateIncome as updateIncomeUtil,
   deleteIncome as deleteIncomeUtil,
 } from '../utils/incomeOperations';
-import { useAccountStore } from './useAccountStore';
+import { useTransactionStore } from './useTransactionStore';
 
 interface IncomeState {
   incomes: Income[];

@@ -71,10 +71,10 @@ export const TransferList: React.FC<TransferListProps> = ({ accountId, limit }) 
   const getAccountName = (accountId: string, accountType: 'bank' | 'credit'): string => {
     if (accountType === 'bank') {
       const account = accounts.find(a => a.id === accountId);
-      return account ? `${account.bankName || account.name} ${account.accountNumber ? `****${account.accountNumber}` : ''}` : 'Unknown Account';
+      return account ? `${account.bankName || account.name} ${account.accountNumber ? `****${account.accountNumber}` : ''}` : 'Cuenta Desconocida';
     } else {
       const card = creditCards.find(c => c.id === accountId);
-      return card ? `${card.bank} ${card.cardName}` : 'Unknown Card';
+      return card ? `${card.bank} ${card.cardName}` : 'Tarjeta Desconocida';
     }
   };
 
@@ -96,9 +96,15 @@ export const TransferList: React.FC<TransferListProps> = ({ accountId, limit }) 
       failed: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800',
     };
 
+    const statusTranslations = {
+      completed: 'Completado',
+      pending: 'Pendiente',
+      failed: 'Fallido',
+    };
+
     return (
-      <span className={`px-2 py-1 text-xs font-medium rounded ${classes[status]}`}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+      <span className={`${classes[status]} px-2 py-1 text-xs font-medium rounded`}>
+        {statusTranslations[status]}
       </span>
     );
   };
@@ -137,7 +143,7 @@ export const TransferList: React.FC<TransferListProps> = ({ accountId, limit }) 
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search transfers..."
+              placeholder="Buscar transferencias..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 dark:placeholder-gray-500"
@@ -152,10 +158,10 @@ export const TransferList: React.FC<TransferListProps> = ({ accountId, limit }) 
               onChange={(e) => setStatusFilter(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
             >
-              <option value="all">All Status</option>
-              <option value="completed">Completed</option>
-              <option value="pending">Pending</option>
-              <option value="failed">Failed</option>
+              <option value="all">Todos los Estados</option>
+              <option value="completed">Completado</option>
+              <option value="pending">Pendiente</option>
+              <option value="failed">Fallido</option>
             </select>
           </div>
 
@@ -167,7 +173,7 @@ export const TransferList: React.FC<TransferListProps> = ({ accountId, limit }) 
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Start Date"
+              placeholder="Fecha de Inicio"
             />
           </div>
 
@@ -179,7 +185,7 @@ export const TransferList: React.FC<TransferListProps> = ({ accountId, limit }) 
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="End Date"
+              placeholder="Fecha de Fin"
             />
           </div>
         </div>
@@ -190,11 +196,11 @@ export const TransferList: React.FC<TransferListProps> = ({ accountId, limit }) 
         {filteredTransfers.length === 0 ? (
           <div className="text-center py-12">
             <ArrowRight className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400 text-lg">No transfers found</p>
+            <p className="text-gray-500 dark:text-gray-400 text-lg">No se encontraron transferencias</p>
             <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
               {searchTerm || statusFilter !== 'all' || startDate || endDate
-                ? 'Try adjusting your filters'
-                : 'Transfers will appear here once you create them'}
+                ? 'Intenta ajustar tus filtros'
+                : 'Las transferencias aparecerán aquí una vez que las crees'}
             </p>
           </div>
         ) : (
@@ -243,10 +249,10 @@ export const TransferList: React.FC<TransferListProps> = ({ accountId, limit }) 
                           {formatDate(transfer.date)}
                         </span>
                         {transfer.fee && transfer.fee > 0 && (
-                          <span>Fee: {formatCurrency(transfer.fee)}</span>
+                          <span>Comisión: {formatCurrency(transfer.fee)}</span>
                         )}
                         {transfer.exchangeRate && (
-                          <span>Rate: {transfer.exchangeRate.toFixed(4)}</span>
+                          <span>Tasa: {transfer.exchangeRate.toFixed(4)}</span>
                         )}
                       </div>
                     </div>
@@ -256,12 +262,12 @@ export const TransferList: React.FC<TransferListProps> = ({ accountId, limit }) 
                       <div className="flex-shrink-0">
                         {deleteConfirm === transfer.id ? (
                           <div className="flex items-center space-x-2">
-                            <span className="text-xs text-gray-600 dark:text-gray-400">Delete?</span>
+                            <span className="text-xs text-gray-600 dark:text-gray-400">¿Eliminar?</span>
                             <button
                               onClick={() => handleDelete(transfer.id)}
                               className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
                             >
-                              Yes
+                              Sí
                             </button>
                             <button
                               onClick={() => setDeleteConfirm(null)}
@@ -274,7 +280,7 @@ export const TransferList: React.FC<TransferListProps> = ({ accountId, limit }) 
                           <button
                             onClick={() => setDeleteConfirm(transfer.id)}
                             className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                            title="Delete transfer"
+                            title="Eliminar transferencia"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -294,13 +300,13 @@ export const TransferList: React.FC<TransferListProps> = ({ accountId, limit }) 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Transfers</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total de Transferencias</p>
               <p className="text-lg font-semibold text-gray-900 dark:text-white">
                 {filteredTransfers.length}
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Amount</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Cantidad Total</p>
               <p className="text-lg font-semibold text-blue-600 dark:text-blue-400">
                 {formatCurrency(
                   filteredTransfers.reduce((sum, t) => sum + t.amount, 0)
@@ -308,7 +314,7 @@ export const TransferList: React.FC<TransferListProps> = ({ accountId, limit }) 
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Fees</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Comisiones Totales</p>
               <p className="text-lg font-semibold text-gray-600 dark:text-gray-300">
                 {formatCurrency(
                   filteredTransfers.reduce((sum, t) => sum + (t.fee || 0), 0)
@@ -321,3 +327,4 @@ export const TransferList: React.FC<TransferListProps> = ({ accountId, limit }) 
     </div>
   );
 };
+

@@ -36,6 +36,9 @@ export const Header = () => {
           <NavLink to="/categories" className={navLinkClasses}>
             Categorías
           </NavLink>
+          <NavLink to="/budget" className={navLinkClasses}>
+            Presupuesto
+          </NavLink>
         </nav>
         <ThemeSwitcher />
       </div>

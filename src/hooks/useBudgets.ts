@@ -1,35 +1,24 @@
-
 import { useLiveQuery } from 'dexie-react-hooks';
+import { useBudgetStore } from '../stores/useBudgetStore';
 import { db } from '../data/db';
-import { Budget } from '../types';
+import { useCallback } from 'react';
 
-export function useBudgets() {
+export const useBudgets = () => {
   const budgets = useLiveQuery(() => db.budgets.toArray(), []);
+  const { addBudget, updateBudget, deleteBudget } = useBudgetStore();
 
-  const addBudget = async (budget: Omit<Budget, 'id'>) => {
-    const newId = crypto.randomUUID();
-    const newBudget: Budget = { ...budget, id: newId };
-    await db.budgets.add(newBudget);
-    return newId;
-  };
+  const getBudgetByCategoryAndPeriod = useCallback((categoryId: string, period: string) => {
+    return budgets?.find(
+      (b) => b.category === categoryId && b.period === period
+    );
+  }, [budgets]);
 
-  const updateBudget = async (id: string, updates: Partial<Budget>) => {
-    await db.budgets.update(id, updates);
+  return {
+    budgets: budgets || [],
+    addBudget,
+    updateBudget,
+    deleteBudget,
+    getBudgetByCategoryAndPeriod,
+    isLoading: budgets === undefined,
   };
-
-  const deleteBudget = async (id: string) => {
-    await db.budgets.delete(id);
-  };
-
-  const getBudgetById = (id: string) => {
-    return db.budgets.get(id);
-  };
-
-  return { 
-    budgets: budgets || [], 
-    addBudget, 
-    updateBudget, 
-    deleteBudget, 
-    getBudgetById 
-  };
-}
+};

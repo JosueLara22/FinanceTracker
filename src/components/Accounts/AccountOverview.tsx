@@ -17,7 +17,7 @@ export const AccountOverview: React.FC = () => {
       const report = await runManualReconciliation();
 
       // Show success message with details
-      const message = `✅ Reconciliation complete! Fixed ${report.reconciliation.balancesFixed} accounts, cleaned up ${report.orphanedCleaned} orphaned transactions.`;
+      const message = `✅ ¡Conciliación completa! Se corrigieron ${report.reconciliation.balancesFixed} cuentas, se limpiaron ${report.orphanedCleaned} transacciones huérfanas.`;
       setReconcileMessage(message);
       console.log('[AccountOverview] Reconciliation successful:', report);
 
@@ -25,7 +25,7 @@ export const AccountOverview: React.FC = () => {
       setTimeout(() => setReconcileMessage(null), 5000);
     } catch (error) {
       console.error('[AccountOverview] Reconciliation failed:', error);
-      setReconcileMessage('❌ Reconciliation failed. Please check the console for details.');
+      setReconcileMessage('❌ Falló la conciliación. Por favor, revisa la consola para más detalles.');
       setTimeout(() => setReconcileMessage(null), 5000);
     } finally {
       setIsReconciling(false);
@@ -72,11 +72,11 @@ export const AccountOverview: React.FC = () => {
           <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
           <div className="flex-1">
             <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-1">
-              Data Integrity & Balance Reconciliation
+              Integridad de Datos y Conciliación de Saldos
             </h3>
             <p className="text-xs text-blue-700 dark:text-blue-400 mb-3">
-              If you notice incorrect balances or inconsistencies, click below to automatically fix discrepancies,
-              recalculate all account balances from transactions, and clean up orphaned data.
+              Si notas saldos incorrectos o inconsistencias, haz clic a continuación para corregir discrepancias automáticamente,
+              recalcular todos los saldos de las cuentas a partir de las transacciones, y limpiar datos huérfanos.
             </p>
 
             <div className="flex items-center gap-4">
@@ -90,7 +90,7 @@ export const AccountOverview: React.FC = () => {
                 }`}
               >
                 <RefreshCw className={`h-4 w-4 ${isReconciling ? 'animate-spin' : ''}`} />
-                {isReconciling ? 'Reconciling...' : 'Fix Balance Issues'}
+                {isReconciling ? 'Conciliando...' : 'Corregir Problemas de Saldo'}
               </button>
 
               {reconcileMessage && (
@@ -116,11 +116,11 @@ export const AccountOverview: React.FC = () => {
               <DollarSign className="h-6 w-6" />
             </div>
           </div>
-          <h3 className="text-sm font-medium mb-1 opacity-90">Net Worth</h3>
+          <h3 className="text-sm font-medium mb-1 opacity-90">Patrimonio Neto</h3>
           <p className="text-3xl font-bold">
             ${netWorth.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
-          <p className="text-xs opacity-75 mt-1">Assets - Liabilities</p>
+          <p className="text-xs opacity-75 mt-1">Activos - Pasivos</p>
         </div>
 
         {/* Total Bank Balance */}
@@ -131,11 +131,11 @@ export const AccountOverview: React.FC = () => {
             </div>
             <TrendingUp className="h-5 w-5 opacity-75" />
           </div>
-          <h3 className="text-sm font-medium mb-1 opacity-90">Total in Banks</h3>
+          <h3 className="text-sm font-medium mb-1 opacity-90">Total en Bancos</h3>
           <p className="text-3xl font-bold">
             ${totalBankBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
-          <p className="text-xs opacity-75 mt-1">{accounts.filter(a => a.isActive).length} active accounts</p>
+          <p className="text-xs opacity-75 mt-1">{accounts.filter(a => a.isActive).length} cuentas activas</p>
         </div>
 
         {/* Credit Card Debt */}
@@ -146,12 +146,12 @@ export const AccountOverview: React.FC = () => {
             </div>
             <TrendingDown className="h-5 w-5 opacity-75" />
           </div>
-          <h3 className="text-sm font-medium mb-1 opacity-90">Credit Card Debt</h3>
+          <h3 className="text-sm font-medium mb-1 opacity-90">Deuda de Tarjeta de Crédito</h3>
           <p className="text-3xl font-bold">
             ${totalCreditBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
           <p className="text-xs opacity-75 mt-1">
-            ${totalAvailableCredit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} available
+            ${totalAvailableCredit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} disponible
           </p>
         </div>
 
@@ -166,12 +166,12 @@ export const AccountOverview: React.FC = () => {
               <TrendingUp className="h-6 w-6" />
             </div>
           </div>
-          <h3 className="text-sm font-medium mb-1 opacity-90">Credit Utilization</h3>
+          <h3 className="text-sm font-medium mb-1 opacity-90">Utilización de Crédito</h3>
           <p className="text-3xl font-bold">
             {creditUtilization.toFixed(1)}%
           </p>
           <p className="text-xs opacity-75 mt-1">
-            {creditUtilization > 30 ? 'Consider paying down' : 'Healthy level'}
+            {creditUtilization > 30 ? 'Considera pagar' : 'Nivel saludable'}
           </p>
         </div>
       </div>
@@ -182,17 +182,17 @@ export const AccountOverview: React.FC = () => {
           <div className="flex items-start">
             <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-500 mt-0.5 mr-3" />
             <div className="flex-1">
-              <h3 className="text-sm font-semibold text-yellow-800 dark:text-yellow-400 mb-2">Attention Needed</h3>
+              <h3 className="text-sm font-semibold text-yellow-800 dark:text-yellow-400 mb-2">Atención Requerida</h3>
               <ul className="space-y-1 text-sm text-yellow-700 dark:text-yellow-300">
                 {highUtilizationCards.map(card => (
                   <li key={card.id}>
-                    • {card.bank} {card.cardName} has high utilization (
+                    • {card.bank} {card.cardName} tiene una alta utilización (
                     {((card.currentBalance / card.creditLimit) * 100).toFixed(1)}%)
                   </li>
                 ))}
                 {paymentDueCards.map(card => (
                   <li key={card.id}>
-                    • {card.bank} {card.cardName} payment due on day {card.paymentDate}
+                    • {card.bank} {card.cardName} pago vence el día {card.paymentDate}
                   </li>
                 ))}
               </ul>
@@ -206,14 +206,14 @@ export const AccountOverview: React.FC = () => {
         {/* Checking Accounts */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Checking</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Corriente</h3>
             <Wallet className="h-5 w-5 text-blue-500" />
           </div>
           <p className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             ${checkingTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {checkingAccounts.length} {checkingAccounts.length === 1 ? 'account' : 'accounts'}
+            {checkingAccounts.length} {checkingAccounts.length === 1 ? 'cuenta' : 'cuentas'}
           </p>
           {checkingAccounts.length > 0 && (
             <div className="mt-4 space-y-2">
@@ -232,14 +232,14 @@ export const AccountOverview: React.FC = () => {
         {/* Savings Accounts */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Savings</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Ahorros</h3>
             <TrendingUp className="h-5 w-5 text-green-500" />
           </div>
           <p className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             ${savingsTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {savingsAccounts.length} {savingsAccounts.length === 1 ? 'account' : 'accounts'}
+            {savingsAccounts.length} {savingsAccounts.length === 1 ? 'cuenta' : 'cuentas'}
           </p>
           {savingsAccounts.length > 0 && (
             <div className="mt-4 space-y-2">
@@ -258,14 +258,14 @@ export const AccountOverview: React.FC = () => {
         {/* Investment Accounts */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Investment</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Inversión</h3>
             <TrendingUp className="h-5 w-5 text-purple-500" />
           </div>
           <p className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             ${investmentTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {investmentAccounts.length} {investmentAccounts.length === 1 ? 'account' : 'accounts'}
+            {investmentAccounts.length} {investmentAccounts.length === 1 ? 'cuenta' : 'cuentas'}
           </p>
           {investmentAccounts.length > 0 && (
             <div className="mt-4 space-y-2">
@@ -284,24 +284,24 @@ export const AccountOverview: React.FC = () => {
 
       {/* Quick Stats */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Stats</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Estadísticas Rápidas</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Accounts</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Cuentas Totales</p>
             <p className="text-xl font-bold text-gray-900 dark:text-white">{accounts.filter(a => a.isActive).length}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Credit Cards</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Tarjetas de Crédito</p>
             <p className="text-xl font-bold text-gray-900 dark:text-white">{creditCards.length}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Credit Limit</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Límite de Crédito Total</p>
             <p className="text-xl font-bold text-gray-900 dark:text-white">
               ${totalCreditLimit.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Avg. Utilization</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Utilización Prom.</p>
             <p className={`text-xl font-bold ${
               creditUtilization > 80 ? 'text-red-600' :
               creditUtilization > 50 ? 'text-yellow-600' : 'text-green-600'

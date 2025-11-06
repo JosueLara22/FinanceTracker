@@ -27,10 +27,10 @@ export const QuickBalanceUpdate: React.FC<QuickBalanceUpdateProps> = ({ account,
       <button
         onClick={() => setIsEditing(true)}
         className="flex items-center space-x-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
-        title="Quick update balance"
+        title="Actualización rápida de saldo"
       >
         <RefreshCw className="h-3 w-3" />
-        <span>Update</span>
+        <span>Actualizar</span>
       </button>
     );
   }
@@ -49,14 +49,14 @@ export const QuickBalanceUpdate: React.FC<QuickBalanceUpdateProps> = ({ account,
         type="submit"
         className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
       >
-        Save
+        Guardar
       </button>
       <button
         type="button"
         onClick={handleCancel}
         className="px-2 py-1 text-xs bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
       >
-        Cancel
+        Cancelar
       </button>
     </form>
   );

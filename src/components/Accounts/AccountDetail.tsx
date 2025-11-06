@@ -49,7 +49,7 @@ export const AccountDetail: React.FC<AccountDetailProps> = ({ type }) => {
       <div className="container mx-auto px-4 py-8">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start">
           <AlertCircle className="w-5 h-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-800">Account ID not provided</p>
+          <p className="text-sm text-red-800">ID de cuenta no proporcionado</p>
         </div>
       </div>
     );
@@ -63,7 +63,7 @@ export const AccountDetail: React.FC<AccountDetailProps> = ({ type }) => {
       <div className="container mx-auto px-4 py-8">
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start">
           <AlertCircle className="w-5 h-5 text-yellow-600 mr-2 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-yellow-800">Account not found</p>
+          <p className="text-sm text-yellow-800">Cuenta no encontrada</p>
         </div>
       </div>
     );
@@ -118,14 +118,14 @@ export const AccountDetail: React.FC<AccountDetailProps> = ({ type }) => {
           className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
-          Back to Accounts
+          Volver a Cuentas
         </button>
 
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
               {type === 'bank'
-                ? `${account!.bankName || account!.name} Account`
+                ? `Cuenta ${account!.bankName || account!.name}`
                 : `${creditCard!.bank} ${creditCard!.cardName}`}
             </h1>
             <p className="text-gray-600 mt-1">
@@ -138,18 +138,18 @@ export const AccountDetail: React.FC<AccountDetailProps> = ({ type }) => {
             <button
               onClick={() => navigate(`/accounts/${type}/${id}/edit`)}
               className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-              title="Edit Account"
+              title="Editar Cuenta"
             >
               <Edit className="w-5 h-5" />
             </button>
             {deleteConfirm ? (
               <div className="flex items-center space-x-2 bg-red-50 px-3 py-2 rounded-lg">
-                <span className="text-sm text-red-900">Delete?</span>
+                <span className="text-sm text-red-900">¿Eliminar?</span>
                 <button
                   onClick={handleDelete}
                   className="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
                 >
-                  Yes
+                  Sí
                 </button>
                 <button
                   onClick={() => setDeleteConfirm(false)}
@@ -162,7 +162,7 @@ export const AccountDetail: React.FC<AccountDetailProps> = ({ type }) => {
               <button
                 onClick={() => setDeleteConfirm(true)}
                 className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                title="Delete Account"
+                title="Eliminar Cuenta"
               >
                 <Trash2 className="w-5 h-5" />
               </button>
@@ -177,7 +177,7 @@ export const AccountDetail: React.FC<AccountDetailProps> = ({ type }) => {
           <>
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm text-gray-600">Current Balance</p>
+                <p className="text-sm text-gray-600">Saldo Actual</p>
                 <DollarSign className="w-5 h-5 text-blue-600" />
               </div>
               <p className="text-2xl font-bold text-gray-900">
@@ -187,14 +187,14 @@ export const AccountDetail: React.FC<AccountDetailProps> = ({ type }) => {
             </div>
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm text-gray-600">Account Type</p>
+                <p className="text-sm text-gray-600">Tipo de Cuenta</p>
                 <Building className="w-5 h-5 text-gray-600" />
               </div>
               <p className="text-xl font-semibold text-gray-900 capitalize">
                 {account!.accountType}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                {account!.isActive ? 'Active' : 'Inactive'}
+                {account!.isActive ? 'Activa' : 'Inactiva'}
               </p>
             </div>
           </>
@@ -202,29 +202,29 @@ export const AccountDetail: React.FC<AccountDetailProps> = ({ type }) => {
           <>
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm text-gray-600">Current Balance</p>
+                <p className="text-sm text-gray-600">Saldo Actual</p>
                 <CreditCardIcon className="w-5 h-5 text-red-600" />
               </div>
               <p className="text-2xl font-bold text-red-600">
                 {formatCurrency(creditCard!.currentBalance)}
               </p>
-              <p className="text-xs text-gray-500 mt-1">Amount Owed</p>
+              <p className="text-xs text-gray-500 mt-1">Monto Adeudado</p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm text-gray-600">Available Credit</p>
+                <p className="text-sm text-gray-600">Crédito Disponible</p>
                 <DollarSign className="w-5 h-5 text-green-600" />
               </div>
               <p className="text-2xl font-bold text-green-600">
                 {formatCurrency(creditCard!.availableCredit)}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                of {formatCurrency(creditCard!.creditLimit)}
+                de {formatCurrency(creditCard!.creditLimit)}
               </p>
             </div>
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm text-gray-600">Utilization</p>
+                <p className="text-sm text-gray-600">Utilización</p>
                 <TrendingUp className="w-5 h-5 text-orange-600" />
               </div>
               <p className="text-2xl font-bold text-gray-900">
@@ -247,7 +247,7 @@ export const AccountDetail: React.FC<AccountDetailProps> = ({ type }) => {
 
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-gray-600">Last Updated</p>
+            <p className="text-sm text-gray-600">Última Actualización</p>
             <Calendar className="w-5 h-5 text-gray-600" />
           </div>
           <p className="text-sm font-medium text-gray-900">
@@ -260,47 +260,47 @@ export const AccountDetail: React.FC<AccountDetailProps> = ({ type }) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-green-800 font-medium">Total In</p>
+            <p className="text-sm text-green-800 font-medium">Total de Ingresos</p>
             <TrendingUp className="w-5 h-5 text-green-700" />
           </div>
           <p className="text-2xl font-bold text-green-900">
             {formatCurrency(totalIn)}
           </p>
           <p className="text-xs text-green-700 mt-1">
-            {transactions.filter(t => t.amount > 0).length} transactions
+            {transactions.filter(t => t.amount > 0).length} transacciones
           </p>
         </div>
 
         <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-red-800 font-medium">Total Out</p>
+            <p className="text-sm text-red-800 font-medium">Total de Egresos</p>
             <TrendingDown className="w-5 h-5 text-red-700" />
           </div>
           <p className="text-2xl font-bold text-red-900">
             {formatCurrency(totalOut)}
           </p>
           <p className="text-xs text-red-700 mt-1">
-            {transactions.filter(t => t.amount < 0).length} transactions
+            {transactions.filter(t => t.amount < 0).length} transacciones
           </p>
         </div>
 
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-blue-800 font-medium">Net Flow</p>
+            <p className="text-sm text-blue-800 font-medium">Flujo Neto</p>
             <DollarSign className="w-5 h-5 text-blue-700" />
           </div>
           <p className={`text-2xl font-bold ${totalIn - totalOut >= 0 ? 'text-green-900' : 'text-red-900'}`}>
             {formatCurrency(totalIn - totalOut)}
           </p>
           <p className="text-xs text-blue-700 mt-1">
-            {transactions.length} total transactions
+            {transactions.length} transacciones totales
           </p>
         </div>
       </div>
 
       {/* Transaction History */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Transaction History</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Historial de Transacciones</h2>
         <TransactionList accountId={id} />
       </div>
     </div>

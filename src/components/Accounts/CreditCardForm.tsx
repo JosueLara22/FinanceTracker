@@ -40,22 +40,22 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({ onClose, cardToE
     e.preventDefault();
 
     if (!bank || !cardName || !lastFourDigits || creditLimit <= 0) {
-      alert('Please fill in all required fields correctly.');
+      alert('Por favor, rellena todos los campos obligatorios correctamente.');
       return;
     }
 
     if (lastFourDigits.length !== 4 || !/^\d+$/.test(lastFourDigits)) {
-      alert('Last four digits must be exactly 4 numeric characters.');
+      alert('Los últimos cuatro dígitos deben ser exactamente 4 caracteres numéricos.');
       return;
     }
 
     if (currentBalance > creditLimit) {
-      alert('Current balance cannot exceed credit limit.');
+      alert('El saldo actual no puede exceder el límite de crédito.');
       return;
     }
 
     if (cutoffDate < 1 || cutoffDate > 31 || paymentDate < 1 || paymentDate > 31) {
-      alert('Cutoff date and payment date must be between 1 and 31.');
+      alert('La fecha de corte y la fecha de pago deben estar entre 1 y 31.');
       return;
     }
 
@@ -79,7 +79,7 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({ onClose, cardToE
       }
       onClose();
     } catch (error) {
-      alert('Failed to save credit card. Please try again.');
+      alert('No se pudo guardar la tarjeta de crédito. Por favor, inténtalo de nuevo.');
       console.error('Error saving credit card:', error);
     }
   };
@@ -89,7 +89,7 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({ onClose, cardToE
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label htmlFor="bank" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Bank Name *
+            Nombre del Banco *
           </label>
           <input
             type="text"
@@ -97,14 +97,14 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({ onClose, cardToE
             value={bank}
             onChange={(e) => setBank(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-DEFAULT focus:ring-primary-DEFAULT dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            placeholder="e.g., BBVA, Santander"
+            placeholder="ej., BBVA, Santander"
             required
           />
         </div>
 
         <div>
           <label htmlFor="cardName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Card Name *
+            Nombre de la Tarjeta *
           </label>
           <input
             type="text"
@@ -112,7 +112,7 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({ onClose, cardToE
             value={cardName}
             onChange={(e) => setCardName(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-DEFAULT focus:ring-primary-DEFAULT dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            placeholder="e.g., Platinum, Gold"
+            placeholder="ej., Platino, Oro"
             required
           />
         </div>
@@ -120,7 +120,7 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({ onClose, cardToE
 
       <div>
         <label htmlFor="lastFourDigits" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Last 4 Digits *
+          Últimos 4 Dígitos *
         </label>
         <input
           type="text"
@@ -137,7 +137,7 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({ onClose, cardToE
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label htmlFor="creditLimit" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Credit Limit *
+            Límite de Crédito *
           </label>
           <input
             type="number"
@@ -153,7 +153,7 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({ onClose, cardToE
 
         <div>
           <label htmlFor="currentBalance" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Current Balance
+            Saldo Actual
           </label>
           <input
             type="number"
@@ -169,13 +169,13 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({ onClose, cardToE
       {/* Utilization Display */}
       <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
         <div className="flex justify-between text-sm mb-2">
-          <span className="text-gray-600 dark:text-gray-400">Available Credit:</span>
+          <span className="text-gray-600 dark:text-gray-400">Crédito Disponible:</span>
           <span className="font-semibold text-gray-900 dark:text-white">
             ${availableCredit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
         </div>
         <div className="flex justify-between text-sm mb-2">
-          <span className="text-gray-600 dark:text-gray-400">Utilization:</span>
+          <span className="text-gray-600 dark:text-gray-400">Utilización:</span>
           <span className={`font-semibold ${
             utilizationPercentage > 80 ? 'text-red-600' :
             utilizationPercentage > 50 ? 'text-yellow-600' : 'text-green-600'
@@ -198,7 +198,7 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({ onClose, cardToE
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label htmlFor="cutoffDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Cutoff Date (Day of Month)
+            Fecha de Corte (Día del Mes)
           </label>
           <input
             type="number"
@@ -213,7 +213,7 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({ onClose, cardToE
 
         <div>
           <label htmlFor="paymentDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Payment Date (Day of Month)
+            Fecha de Pago (Día del Mes)
           </label>
           <input
             type="number"
@@ -229,7 +229,7 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({ onClose, cardToE
 
       <div>
         <label htmlFor="interestRate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Interest Rate (Annual %)
+          Tasa de Interés (Anual %)
         </label>
         <input
           type="number"
@@ -250,14 +250,14 @@ export const CreditCardForm: React.FC<CreditCardFormProps> = ({ onClose, cardToE
           className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-DEFAULT"
           data-testid="cancel-button"
         >
-          Cancel
+          Cancelar
         </button>
         <button
           type="submit"
           className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-DEFAULT hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-DEFAULT"
           data-testid="submit-button"
         >
-          {cardToEdit ? 'Update Card' : 'Add Card'}
+          {cardToEdit ? 'Actualizar Tarjeta' : 'Agregar Tarjeta'}
         </button>
       </div>
     </form>

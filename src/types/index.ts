@@ -183,6 +183,19 @@ export interface Budget {
   period: string; // 'YYYY-MM'
   spent: number; // Calculated from expenses
   alertThreshold: number; // Percentage (e.g., 80)
+  rollover: boolean;             // Unused budget carries to next month
+  rolloverAmount?: number;
+  notificationsEnabled: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface BudgetStatus {
+  spent: number;
+  limit: number;
+  percentage: number;
+  remaining: number;
+  status: 'safe' | 'warning' | 'danger' | 'exceeded';
 }
 
 export interface SavingsGoal {
@@ -203,6 +216,7 @@ export interface Category {
   icon?: string;
   color?: string;
   subcategories?: string[];
+  parentCategoryId?: string; // Added for hierarchical categories
   isDefault?: boolean;
   order?: number;
   budgetEnabled?: boolean;

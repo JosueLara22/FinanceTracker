@@ -43,7 +43,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({ onClose, accountToEdit
     e.preventDefault();
 
     if (!name || (type === 'bank' && (!bankName || !accountNumber))) {
-      alert('Please fill in all required fields.');
+      alert('Por favor, rellena todos los campos obligatorios.');
       return;
     }
 
@@ -79,7 +79,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({ onClose, accountToEdit
       }
       onClose();
     } catch (error) {
-      alert('Failed to save account. Please try again.');
+      alert('No se pudo guardar la cuenta. Por favor, inténtalo de nuevo.');
       console.error('Error saving account:', error);
     }
   };
@@ -88,7 +88,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({ onClose, accountToEdit
     <form onSubmit={handleSubmit} className="space-y-4" data-testid="account-form">
       <div>
         <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Account Type
+          Tipo de Cuenta
         </label>
         <select
           id="type"
@@ -97,16 +97,16 @@ export const AccountForm: React.FC<AccountFormProps> = ({ onClose, accountToEdit
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-DEFAULT focus:ring-primary-DEFAULT dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           disabled={!!accountToEdit} // Disable type change when editing
         >
-          <option value="bank">Bank Account</option>
-          <option value="cash" disabled={cashAccountExists} title={cashAccountExists ? "You can only have one cash account." : ''}>
-            Cash
+          <option value="bank">Cuenta Bancaria</option>
+          <option value="cash" disabled={cashAccountExists} title={cashAccountExists ? "Solo puedes tener una cuenta de efectivo." : ''}>
+            Efectivo
           </option>
         </select>
       </div>
 
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Account Name
+          Nombre de la Cuenta
         </label>
         <input
           type="text"
@@ -114,7 +114,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({ onClose, accountToEdit
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-DEFAULT focus:ring-primary-DEFAULT dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-          placeholder={type === 'cash' ? "e.g., My Wallet, Efectivo" : "e.g., BBVA Debit, Santander Credit"}
+          placeholder={type === 'cash' ? "ej., Mi Cartera, Efectivo" : "ej., Débito BBVA, Crédito Santander"}
           required
         />
       </div>
@@ -123,7 +123,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({ onClose, accountToEdit
         <>
           <div>
             <label htmlFor="bankName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Bank Name
+              Nombre del Banco
             </label>
             <input
               type="text"
@@ -131,14 +131,14 @@ export const AccountForm: React.FC<AccountFormProps> = ({ onClose, accountToEdit
               value={bankName}
               onChange={(e) => setBankName(e.target.value)}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-DEFAULT focus:ring-primary-DEFAULT dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="e.g., BBVA, Santander, Nu"
+              placeholder="ej., BBVA, Santander, Nu"
               required={type === 'bank'}
             />
           </div>
 
           <div>
             <label htmlFor="accountType" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Bank Account Type
+              Tipo de Cuenta Bancaria
             </label>
             <select
               id="accountType"
@@ -146,14 +146,14 @@ export const AccountForm: React.FC<AccountFormProps> = ({ onClose, accountToEdit
               onChange={(e) => setAccountType(e.target.value as 'checking' | 'savings')}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-DEFAULT focus:ring-primary-DEFAULT dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
-              <option value="checking">Checking</option>
-              <option value="savings">Savings</option>
+              <option value="checking">Corriente</option>
+              <option value="savings">Ahorros</option>
             </select>
           </div>
 
           <div>
             <label htmlFor="accountNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Account Number (Last 4 digits)
+              Número de Cuenta (Últimos 4 dígitos)
             </label>
             <input
               type="text"
@@ -172,7 +172,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({ onClose, accountToEdit
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label htmlFor="balance" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Current Balance
+            Saldo Actual
           </label>
           <input
             type="number"
@@ -187,7 +187,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({ onClose, accountToEdit
 
         <div>
           <label htmlFor="currency" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Currency
+            Moneda
           </label>
           <select
             id="currency"
@@ -210,7 +210,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({ onClose, accountToEdit
           className="h-4 w-4 text-primary-DEFAULT focus:ring-primary-DEFAULT border-gray-300 rounded"
         />
         <label htmlFor="isActive" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-          Active Account
+          Cuenta Activa
         </label>
       </div>
 
@@ -221,14 +221,14 @@ export const AccountForm: React.FC<AccountFormProps> = ({ onClose, accountToEdit
           className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-DEFAULT"
           data-testid="cancel-button"
         >
-          Cancel
+          Cancelar
         </button>
         <button
           type="submit"
           className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-DEFAULT hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-DEFAULT"
           data-testid="submit-button"
         >
-          {accountToEdit ? 'Update Account' : 'Add Account'}
+          {accountToEdit ? 'Actualizar Cuenta' : 'Agregar Cuenta'}
         </button>
       </div>
     </form>

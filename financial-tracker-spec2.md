@@ -1329,6 +1329,36 @@ Each card shows:
 - Recommendations for next month
 - Savings potential identified
 
+### 5a. Budget Feature Implementation Plan
+
+This section outlines the technical steps to implement the budget feature based on the specifications above.
+
+**1. Data Structures and Database**
+
+*   **`src/types/index.ts`**: Define the `Budget` and `BudgetStatus` interfaces.
+*   **`src/data/db.ts`**: Update the `FinanceTrackerDB` Dexie schema to include a `budgets` table with the indexes `'id, category, period'`.
+
+**2. State Management (Zustand)**
+
+*   **`src/stores/useBudgetStore.ts`**: Create a new Zustand store to manage the state for budgets. This store will handle CRUD (Create, Read, Update, Delete) operations.
+
+**3. Business Logic and Data Hooks**
+
+*   **`src/utils/budgetCalculations.ts`**: Create a utility file for the `calculateBudgetUsage` function.
+*   **`src/hooks/useBudgets.ts`**: Develop a custom hook to interact with the `useBudgetStore`.
+
+**4. UI Components (`src/components/Budget/`)**
+
+*   **`BudgetPlanner.tsx`**: Main page component.
+*   **`BudgetForm.tsx`**: Form for creating/editing budgets.
+*   **`BudgetList.tsx`**: Renders a list of `BudgetCard` components.
+*   **`BudgetCard.tsx`**: Displays the status of a single budget.
+*   **`BudgetOverview.tsx`**: Summary component showing total budget vs. spending.
+
+**5. Routing**
+
+*   Add a new route `/budget` in the main application router to render the `BudgetPlanner` component.
+
 ### 6. Accounts Overview
 
 **Bank Accounts Section:**

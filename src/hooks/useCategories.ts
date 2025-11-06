@@ -23,8 +23,9 @@ export function useCategories() {
   };
 
   const getCategoryById = useCallback((id: string) => {
-    return db.categories.get(id);
-  }, []);
+    if (!categories) return undefined;
+    return categories.find(c => c.id === id);
+  }, [categories]);
 
   return {
     categories: categories || [],
@@ -32,5 +33,6 @@ export function useCategories() {
     updateCategory,
     deleteCategory,
     getCategoryById,
+    isLoading: categories === undefined,
   };
 }

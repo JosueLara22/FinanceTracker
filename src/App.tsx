@@ -9,6 +9,7 @@ import { ExpenseForm } from './components/Expenses/ExpenseForm';
 import { IncomeForm } from './components/Income/IncomeForm';
 import { AccountDetail } from './components/Accounts/AccountDetail';
 import { Header } from './components/common/Header';
+import { BudgetPlanner } from './components/Budget';
 import { Categories } from './components/Categories';
 import { Transfers } from './components/Transfers';
 import { DataBackup } from './components/DataBackup';
@@ -72,6 +73,7 @@ function App() {
             <Route path="/income" element={<Income />} />
             <Route path="/transfers" element={<Transfers />} />
             <Route path="/categories" element={<Categories />} />
+            <Route path="/budget" element={<BudgetPlanner />} />
             <Route path="/accounts/bank/:id" element={<AccountDetail type="bank" />} />
             <Route path="/accounts/credit/:id" element={<AccountDetail type="credit" />} />
             <Route path="/expenses/:id" element={<Expenses />} />

@@ -10,6 +10,7 @@ import { useAccountStore } from './useAccountStore';
 import { useUIStore } from './useUIStore';
 import { useSettingsStore } from './useSettingsStore';
 import { useTransferStore } from './useTransferStore';
+import { useCategoryStore } from './useCategoryStore';
 
 // Import validation utilities
 import {
@@ -27,7 +28,8 @@ export {
   useAccountStore,
   useUIStore,
   useSettingsStore,
-  useTransferStore
+  useTransferStore,
+  useCategoryStore
 };
 
 // Store initialization utility
@@ -45,6 +47,7 @@ export const initializeStores = async () => {
     useAccountStore.getState().loadCreditCards(),
     useAccountStore.getState().loadBudgets(),
     useAccountStore.getState().loadSavingsGoals(),
+    useCategoryStore.getState().loadCategories(),
   ]);
 
   // Run startup validations to check data integrity

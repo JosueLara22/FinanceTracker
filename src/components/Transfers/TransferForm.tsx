@@ -43,14 +43,14 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
       .filter(a => a.isActive)
       .map(a => ({
         value: a.id,
-        label: `${a.name} (${formatCurrency(a.balance)})`,
+        label: `${a.name} (Saldo: ${formatCurrency(a.balance)})`,
         type: 'bank' as const,
         balance: a.balance,
       }));
 
     const creditOptions = creditCards.map(c => ({
       value: c.id,
-      label: `${c.cardName} (Available: ${formatCurrency(c.availableCredit)})`,
+      label: `${c.cardName} (Disponible: ${formatCurrency(c.availableCredit)})`,
       type: 'credit' as const,
       balance: c.availableCredit,
     }));
@@ -71,7 +71,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
       .filter(c => c.id !== fromAccountId)
       .map(c => ({
         value: c.id,
-        label: `${c.cardName} (Pay Balance)`,
+        label: `${c.cardName} (Pagar Saldo)`,
         type: 'credit' as const,
       }));
 
@@ -126,27 +126,27 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
 
     // Validation
     if (!fromAccountId) {
-      setError('Please select a source account');
+      setError('Por favor, selecciona una cuenta de origen');
       return;
     }
 
     if (!toAccountId) {
-      setError('Please select a destination account');
+      setError('Por favor, selecciona una cuenta de destino');
       return;
     }
 
     if (fromAccountId === toAccountId) {
-      setError('Source and destination accounts must be different');
+      setError('Las cuentas de origen y destino deben ser diferentes');
       return;
     }
 
     if (!amount || parseFloat(amount) <= 0) {
-      setError('Please enter a valid amount');
+      setError('Por favor, introduce una cantidad válida');
       return;
     }
 
     if (!description.trim()) {
-      setError('Please enter a description');
+      setError('Por favor, introduce una descripción');
       return;
     }
 
@@ -190,13 +190,13 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
         if (onSuccess) onSuccess();
       }, 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create transfer');
+      setError(err instanceof Error ? err.message : 'Error al crear la transferencia');
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">New Transfer</h2>
+      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Nueva Transferencia</h2>
 
       {/* Error Message */}
       {(error || storeError) && (
@@ -210,7 +210,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
       {success && (
         <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-start">
           <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-2 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-green-800 dark:text-green-200">Transfer created successfully!</p>
+          <p className="text-sm text-green-800 dark:text-green-200">¡Transferencia creada con éxito!</p>
         </div>
       )}
 
@@ -218,7 +218,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
         {/* From Account */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            From Account
+            Cuenta de Origen
           </label>
           <select
             value={fromAccountId}
@@ -226,7 +226,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           >
-            <option value="">Select source account</option>
+            <option value="">Selecciona cuenta de origen</option>
             {getSourceAccountOptions().map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
@@ -243,7 +243,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
         {/* To Account */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            To Account
+            Cuenta de Destino
           </label>
           <select
             value={toAccountId}
@@ -252,7 +252,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
             required
             disabled={!fromAccountId}
           >
-            <option value="">Select destination account</option>
+            <option value="">Selecciona cuenta de destino</option>
             {getDestinationAccountOptions().map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
@@ -264,7 +264,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
         {/* Amount */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Amount
+            Cantidad
           </label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">
@@ -286,7 +286,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
         {/* Fee (Optional) */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Transfer Fee (Optional)
+            Comisión de Transferencia (Opcional)
           </label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">
@@ -307,14 +307,14 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
         {/* Description */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Description
+            Descripción
           </label>
           <input
             type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 dark:placeholder-gray-500"
-            placeholder="e.g., Credit card payment, Savings transfer"
+            placeholder="Ej: Pago de tarjeta de crédito, Transferencia a ahorros"
             required
           />
         </div>
@@ -322,7 +322,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
         {/* Date */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Date
+            Fecha
           </label>
           <input
             type="date"
@@ -337,11 +337,11 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
         {/* Transfer Summary */}
         {fromAccountId && toAccountId && amount && parseFloat(amount) > 0 && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">Transfer Summary</h3>
+            <h3 className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">Resumen de Transferencia</h3>
             <div className="space-y-1 text-sm text-blue-800 dark:text-blue-200">
-              <p>Amount to transfer: <span className="font-semibold">{formatCurrency(parseFloat(amount))}</span></p>
+              <p>Cantidad a transferir: <span className="font-semibold">{formatCurrency(parseFloat(amount))}</span></p>
               {fee && parseFloat(fee) > 0 && (
-                <p>Transfer fee: <span className="font-semibold">{formatCurrency(parseFloat(fee))}</span></p>
+                <p>Comisión de transferencia: <span className="font-semibold">{formatCurrency(parseFloat(fee))}</span></p>
               )}
               <p className="pt-2 border-t border-blue-300 dark:border-blue-700">
                 Total: <span className="font-semibold">{formatCurrency(parseFloat(amount) + (fee ? parseFloat(fee) : 0))}</span>
@@ -359,7 +359,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
               className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               disabled={isLoading}
             >
-              Cancel
+              Cancelar
             </button>
           )}
           <button
@@ -373,10 +373,10 @@ export const TransferForm: React.FC<TransferFormProps> = ({ onSuccess, onCancel,
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Processing...
+                Procesando...
               </>
             ) : (
-              'Create Transfer'
+              'Crear Transferencia'
             )}
           </button>
         </div>

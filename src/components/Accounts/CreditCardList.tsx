@@ -24,7 +24,7 @@ export const CreditCardList: React.FC<CreditCardListProps> = ({ creditCards, onE
       await loadCreditCards();
     } catch (error) {
       console.error('[CreditCardList] Failed to update balance:', error);
-      alert('Failed to update balance. Please try again.');
+      alert('No se pudo actualizar el saldo. Por favor, inténtalo de nuevo.');
     }
   };
 
@@ -69,8 +69,8 @@ export const CreditCardList: React.FC<CreditCardListProps> = ({ creditCards, onE
     return (
       <div className="text-center py-12">
         <CreditCardIcon className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-        <p className="text-gray-500 dark:text-gray-400">No credit cards added yet.</p>
-        <p className="text-sm text-gray-400 dark:text-gray-500">Add your first credit card to start tracking!</p>
+        <p className="text-gray-500 dark:text-gray-400">Aún no se han agregado tarjetas de crédito.</p>
+        <p className="text-sm text-gray-400 dark:text-gray-500">¡Agrega tu primera tarjeta de crédito para comenzar a rastrear!</p>
       </div>
     );
   }
@@ -96,7 +96,7 @@ export const CreditCardList: React.FC<CreditCardListProps> = ({ creditCards, onE
               {paymentDueSoon && (
                 <span className="flex items-center px-2 py-1 text-xs font-semibold text-red-100 bg-red-600 rounded-full">
                   <AlertTriangle className="h-3 w-3 mr-1" />
-                  Due Soon
+                  Vence Pronto
                 </span>
               )}
             </div>
@@ -111,7 +111,7 @@ export const CreditCardList: React.FC<CreditCardListProps> = ({ creditCards, onE
             {/* Current Balance */}
             <div className="mb-4">
               <div className="flex items-center justify-between mb-1">
-                <p className="text-xs text-gray-500 dark:text-gray-400">Current Balance</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Saldo Actual</p>
                 <QuickBalanceUpdate
                   account={{ ...card, balance: card.currentBalance } as any}
                   onUpdate={handleQuickBalanceUpdate}
@@ -121,14 +121,14 @@ export const CreditCardList: React.FC<CreditCardListProps> = ({ creditCards, onE
                 ${card.currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                of ${card.creditLimit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} limit
+                de ${card.creditLimit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} de límite
               </p>
             </div>
 
             {/* Utilization Bar */}
             <div className="mb-4">
               <div className="flex justify-between text-xs mb-2">
-                <span className="text-gray-500 dark:text-gray-400">Credit Utilization</span>
+                <span className="text-gray-500 dark:text-gray-400">Utilización de Crédito</span>
                 <span className={getUtilizationColor(utilization, card.currentBalance)} data-testid={`credit-card-utilization-${card.id}`}>
                   {utilization.toFixed(1)}%
                 </span>
@@ -143,7 +143,7 @@ export const CreditCardList: React.FC<CreditCardListProps> = ({ creditCards, onE
 
             {/* Available Credit */}
             <div className="mb-4 p-3 bg-blue-200/50 dark:bg-white/5 rounded-lg">
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Available Credit</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Crédito Disponible</p>
               <p className="text-lg font-semibold text-green-600 dark:text-green-400">
                 ${card.availableCredit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
@@ -154,16 +154,16 @@ export const CreditCardList: React.FC<CreditCardListProps> = ({ creditCards, onE
               <div className="p-2 bg-blue-200/50 dark:bg-white/5 rounded">
                 <div className="flex items-center text-gray-500 dark:text-gray-400 mb-1">
                   <Calendar className="h-3 w-3 mr-1" />
-                  <span>Cutoff</span>
+                  <span>Corte</span>
                 </div>
-                <p className="font-semibold">Day {card.cutoffDate}</p>
+                <p className="font-semibold">Día {card.cutoffDate}</p>
               </div>
               <div className="p-2 bg-blue-200/50 dark:bg-white/5 rounded">
                 <div className="flex items-center text-gray-500 dark:text-gray-400 mb-1">
                   <Calendar className="h-3 w-3 mr-1" />
-                  <span>Payment</span>
+                  <span>Pago</span>
                 </div>
-                <p className="font-semibold">Day {card.paymentDate}</p>
+                <p className="font-semibold">Día {card.paymentDate}</p>
               </div>
             </div>
 
@@ -172,7 +172,7 @@ export const CreditCardList: React.FC<CreditCardListProps> = ({ creditCards, onE
               <div className="mb-4 p-3 bg-yellow-100 border border-yellow-300 dark:bg-yellow-500/10 dark:border-yellow-500/20 rounded-lg">
                 <div className="flex items-center text-xs text-yellow-700 dark:text-yellow-400 mb-1">
                   <AlertTriangle className="h-3 w-3 mr-1" />
-                  <span>Minimum Payment</span>
+                  <span>Pago Mínimo</span>
                 </div>
                 <p className="text-sm font-semibold text-yellow-800 dark:text-yellow-300">
                   ${minimumPayment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -185,7 +185,7 @@ export const CreditCardList: React.FC<CreditCardListProps> = ({ creditCards, onE
               <div className="mb-4 flex items-center justify-between text-xs p-2 bg-blue-200/50 dark:bg-white/5 rounded">
                 <div className="flex items-center text-gray-500 dark:text-gray-400">
                   <TrendingUp className="h-3 w-3 mr-1" />
-                  <span>Interest Rate</span>
+                  <span>Tasa de Interés</span>
                 </div>
                 <span className="font-semibold">{card.interestRate.toFixed(2)}%</span>
               </div>
@@ -199,7 +199,7 @@ export const CreditCardList: React.FC<CreditCardListProps> = ({ creditCards, onE
                   className="w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white rounded-md text-sm font-medium transition-colors flex items-center justify-center shadow-sm"
                   data-testid={`make-payment-${card.id}`}>
                   <DollarSign className="h-4 w-4 mr-1" />
-                  Make Payment
+                  Realizar Pago
                 </button>
               )}
               <div className="flex space-x-2">
@@ -207,13 +207,13 @@ export const CreditCardList: React.FC<CreditCardListProps> = ({ creditCards, onE
                   onClick={() => onEditCard(card)}
                   className="flex-1 px-3 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-white/10 dark:hover:bg-white/20 rounded-md text-sm font-medium transition-colors"
                   data-testid={`edit-credit-card-${card.id}`}>
-                  Edit
+                  Editar
                 </button>
                 <button
                   onClick={() => onDeleteCard(card.id)}
                   className="flex-1 px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 dark:bg-red-600/20 dark:hover:bg-red-600/30 dark:text-red-300 rounded-md text-sm font-medium transition-colors"
                   data-testid={`delete-credit-card-${card.id}`}>
-                  Delete
+                  Eliminar
                 </button>
               </div>
             </div>
