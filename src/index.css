@@ -17,18 +17,31 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html {
+  background-color: #f8f9fa; /* gray-50 */
+  min-height: 100vh;
+  height: 100%;
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   display: flex;
   min-width: 320px;
   min-height: 100vh;
+  height: 100%;
   background-color: #f8f9fa; /* gray-50 */
+  overflow-x: hidden;
 }
 
 #root {
   width: 100%;
   min-height: 100vh;
   background-color: #f8f9fa; /* gray-50 */
+}
+
+.dark html {
+  background-color: #1a1d20; /* gray-900 */
 }
 
 .dark body {
