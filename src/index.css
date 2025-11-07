@@ -20,6 +20,7 @@
 html {
   background-color: #f8f9fa; /* gray-50 */
   min-height: 100vh;
+  min-height: 100dvh; /* Use dynamic viewport height for mobile */
   height: 100%;
   overflow-x: hidden;
 }
@@ -29,6 +30,7 @@ body {
   display: flex;
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh; /* Use dynamic viewport height for mobile */
   height: 100%;
   background-color: #f8f9fa; /* gray-50 */
   overflow-x: hidden;
@@ -51,4 +53,30 @@ body {
 
 .dark #root {
   background-color: #1a1d20; /* gray-900 */
+}
+
+/* Custom scrollbar styles for webkit browsers */
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #d1d5db; /* gray-300 */
+  border-radius: 3px;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #4b5563; /* gray-600 */
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af; /* gray-400 */
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #6b7280; /* gray-500 */
 }

@@ -4,7 +4,7 @@ import ThemeSwitcher from './ThemeSwitcher';
 
 export const Header = () => {
   const navLinkClasses = ({ isActive }: { isActive: boolean }) =>
-    `px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+    `px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 whitespace-nowrap ${
       isActive
         ? 'bg-primary-dark text-white dark:bg-primary-DEFAULT'
         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
@@ -12,9 +12,12 @@ export const Header = () => {
 
   return (
     <header className="flex-shrink-0 bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-primary-DEFAULT dark:text-primary-dark">Control Financiero</h1>
-        <nav className="flex space-x-4">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex justify-between items-center mb-3">
+          <h1 className="text-2xl font-bold text-primary-DEFAULT dark:text-primary-dark whitespace-nowrap">Control Financiero</h1>
+          <ThemeSwitcher />
+        </div>
+        <nav className="flex space-x-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
           <NavLink to="/" className={navLinkClasses}>
             Panel
           </NavLink>
@@ -40,7 +43,6 @@ export const Header = () => {
             Presupuesto
           </NavLink>
         </nav>
-        <ThemeSwitcher />
       </div>
     </header>
   );
