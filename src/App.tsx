@@ -62,56 +62,57 @@ function App() {
 
   return (
     <Router basename={import.meta.env.BASE_URL}>
-      <main className={`bg-gray-50 dark:bg-gray-900 min-h-screen`}>
+      <div className="flex flex-col h-screen">
         <Header />
-        <div className="container mx-auto p-4">
-          <Routes>
-            <Route path="/" element={<Dashboard onAddExpenseClick={() => setExpenseFormOpen(true)} onAddIncomeClick={() => setIncomeFormOpen(true)} />} />
-            <Route path="/expenses" element={<Expenses />} />
-            <Route path="/investments" element={<Investments />} />
-            <Route path="/accounts" element={<Accounts />} />
-            <Route path="/income" element={<Income />} />
-            <Route path="/transfers" element={<Transfers />} />
-            <Route path="/categories" element={<Categories />} />
-            <Route path="/budget" element={<BudgetPlanner />} />
-            <Route path="/accounts/bank/:id" element={<AccountDetail type="bank" />} />
-            <Route path="/accounts/credit/:id" element={<AccountDetail type="credit" />} />
-            <Route path="/expenses/:id" element={<Expenses />} />
-            <Route path="/incomes/:id" element={<Income />} />
-          </Routes>
-        </div>
-
-        {isExpenseFormOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg">
-              <ExpenseForm 
-                onAddExpense={async (expense) => {
-                  await addExpense(expense);
-                  setExpenseFormOpen(false);
-                }}
-                onClose={() => setExpenseFormOpen(false)} 
-              />
-            </div>
-          </div>
-        )}
-
-        {isIncomeFormOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg">
-              <IncomeForm 
-                onAddIncome={(income) => {
-                  addIncome(income);
-                  setIncomeFormOpen(false);
-                }}
-                onClose={() => setIncomeFormOpen(false)} 
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Data Backup Utility */}
-        <DataBackup />
-      </main>
+        <main className="flex-grow overflow-y-auto">
+                  <div className="container mx-auto p-4">
+                    <Routes>
+                      <Route path="/" element={<Dashboard onAddExpenseClick={() => setExpenseFormOpen(true)} onAddIncomeClick={() => setIncomeFormOpen(true)} />} />
+                      <Route path="/expenses" element={<Expenses />} />
+                      <Route path="/investments" element={<Investments />} />
+                      <Route path="/accounts" element={<Accounts />} />
+                      <Route path="/income" element={<Income />} />
+                      <Route path="/transfers" element={<Transfers />} />
+                      <Route path="/categories" element={<Categories />} />
+                      <Route path="/budget" element={<BudgetPlanner />} />
+                      <Route path="/accounts/bank/:id" element={<AccountDetail type="bank" />} />
+                      <Route path="/accounts/credit/:id" element={<AccountDetail type="credit" />} />
+                      <Route path="/expenses/:id" element={<Expenses />} />
+                      <Route path="/incomes/:id" element={<Income />} />
+                    </Routes>
+                  </div>
+          
+                  {isExpenseFormOpen && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                      <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg">
+                        <ExpenseForm 
+                          onAddExpense={async (expense) => {
+                            await addExpense(expense);
+                            setExpenseFormOpen(false);
+                          }}
+                          onClose={() => setExpenseFormOpen(false)} 
+                        />
+                      </div>
+                    </div>
+                  )}
+          
+                  {isIncomeFormOpen && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                      <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg">
+                        <IncomeForm 
+                          onAddIncome={(income) => {
+                            addIncome(income);
+                            setIncomeFormOpen(false);
+                          }}
+                          onClose={() => setIncomeFormOpen(false)} 
+                        />
+                      </div>
+                    </div>
+                  )}
+                </main>
+          
+                {/* Data Backup Utility */}
+                <DataBackup />      </div>
     </Router>
   );
 }
